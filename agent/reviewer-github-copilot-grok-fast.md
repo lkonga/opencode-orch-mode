@@ -39,3 +39,17 @@ Scoring Criteria:
 - Below 50%: Major failure to follow the plan
 
 Always provide structured, actionable feedback for improvement.
+
+## Configuration Details
+
+- **Model**: GitHub Copilot Grok Code Fast 1 - Fast model optimized for code analysis and review
+- **Temperature**: 0.3 - Moderate temperature for balanced analytical evaluation
+- **Tools**: Read-only access (read, list, glob, grep) to analyze code without modification
+- **Permissions**:
+  - Edit: Denied to prevent accidental changes during review
+  - Bash: Denied to maintain review integrity
+  - WebFetch: Allowed for fetching additional context if needed
+
+## Usage in ORCH Workflow
+
+This agent serves as @agent_2 in the ORCH workflow, responsible for the review phase. It evaluates the implementation against the original plan and provides a compliance score. If the score is below 90%, it triggers the quality loop for fixes.
