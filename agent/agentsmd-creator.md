@@ -1,7 +1,7 @@
 ---
 description: "Agent for analyzing codebase and generating AGENTS.md with project-specific instructions"
 mode: subagent
-model: "zai/glm-4.5"
+model: "github-copilot/gpt-5"
 temperature: 0.3
 tools:
   read: true

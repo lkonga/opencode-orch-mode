@@ -1,3 +1,35 @@
+# Rules-Fetcher Agent Usage (Critical)
+
+## Correct Invocation
+
+The `rules-fetcher` agent does NOT accept `--scope project` as a CLI flag. Instead, you must pass the scope as part of the message.
+
+**Project scope example:**
+
+```bash
+opencode run --agent rules-fetcher "fetch relevant rules for app development in project scope"
+```
+
+**Global scope example:**
+
+```bash
+opencode run --agent rules-fetcher "fetch relevant rules for app development in global scope"
+```
+
+**Do NOT use:**
+
+```bash
+opencode run --agent rules-fetcher --scope project "fetch relevant rules for app development"
+```
+
+This will NOT work and will only show the help message.
+
+**Summary:**
+
+- Always specify the agent with `--agent rules-fetcher`
+- Pass the scope (project/global) in the message itself
+- The positional message argument is required for the agent to run
+
 # OpenCode ORCH Agents
 
 ## ⚠️ IMPORTANT: Correct Agent Folder Location

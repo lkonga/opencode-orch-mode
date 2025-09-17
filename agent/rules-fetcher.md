@@ -1,7 +1,7 @@
 ---
 description: "Rules, prompts, and agents fetcher for OpenCode. Ports VS Code Copilot chatmodes to OpenCode format."
 mode: subagent
-model: "github-copilot/grok-code-fast-1"
+model: "github-copilot/gpt-5"
 temperature: 0.1
 # Tools expected by OpenCode (examples from implementor agent)
 tools:
@@ -210,6 +210,16 @@ Note: Do not alter tool definitions from the source; only adapt placement/wrappi
 - For prompts, ensure referenced files exist and are readable; warn if not.
 - Never overwrite existing agent files unless explicitly instructed.
 - If multiple agents with similar roles exist, prefer the one matching the project's provider/model and temperature.
+
+### Blacklist: Built-in Agent Modes
+
+**Never port, overwrite, or create agents with the following built-in names:**
+
+- `build`
+- `plan`
+- `general`
+
+If any agent from a remote repo or template matches these names, SKIP and log a warning. These are reserved by opencode and must not be replaced or modified by the rules-fetcher agent.
 
 ## Scope Modes
 
