@@ -4,7 +4,7 @@
 
 **Agents MUST be in `~/.config/opencode/agent/` (singular "agent", not "agents")**
 
-OpenCode expects agents in the singular `agent` folder. The workspace `agent/` folder contains templates that get symlinked to the correct location.
+OpenCode expects agents in the singular `agent` folder. The workspace `agents/` folder contains templates that get symlinked to the correct location.
 
 ## Using ORCH Workflow
 
@@ -52,6 +52,8 @@ opencode run --agent glm "Confirm your role and temperature"
 | `@glm`                               | zai/glm-4.5                     | 0.3  | Read-only   | Review             |
 | `@implementor-zai-glm-4-5`           | zai/glm-4.5                     | 0.1  | Full write  | Alt Implementation |
 | `@reviewer-github-copilot-grok-fast` | github-copilot/grok-code-fast-1 | 0.3  | Read-only   | Alt Review         |
+| `@agentsmd-creator`                  | zai/glm-4.5                     | 0.3  | Full write  | AGENTS.md Creator  |
+| `@rules-fetcher`                     | github-copilot/grok-code-fast-1 | 0.3  | Full write  | Rules Fetcher      |
 
 ## Troubleshooting
 
@@ -102,3 +104,61 @@ Role instructions...
 # Use alternative agents
 /orch "... using @implementor-zai-glm-4-5 as agent_1 and @reviewer-github-copilot-grok-fast as agent_2"
 ```
+
+## Additional Agents
+
+### @agentsmd-creator
+
+- **Purpose**: Analyzes codebase and generates/updates `agents.md` with project-specific instructions for AI agents.
+- **Usage**: `opencode run --agent agentsmd-creator "analyze this project and create agents.md"`
+- **Output**: Creates `agents.md` in project root with architecture, workflows, and conventions.
+
+### @rules-fetcher
+
+- **Purpose**: Fetches relevant prompts, instructions, and chatmodes from https://github.com/github/awesome-copilot, using `agents.md` for context.
+- **Usage**: `opencode run --agent rules-fetcher "fetch relevant rules for app development"`
+- **Prerequisites**: Ensures `agents.md` exists (runs `agentsmd-creator` if needed).
+- **Output**: Downloads files to appropriate folders, provides workflow summary.
+
+## OpenCode Rules & Instructions Support
+
+OpenCode supports setting rules, prompts, and instructions both globally and per project, injected into every LLM message.
+
+### Global and Project-Specific Rules
+
+- **Project**: Place `AGENTS.md` in project root.
+- **Global**: Place `AGENTS.md` in `~/.config/opencode/AGENTS.md`.
+- Both are merged and injected automatically.
+
+### Custom Instruction Files
+
+- Specify in `opencode.json` (project) or `~/.config/opencode/opencode.json` (global):
+  ```json
+  {
+    "instructions": [
+      "CONTRIBUTING.md",
+      "docs/guidelines.md",
+      ".cursor/rules/*.md"
+    ]
+  }
+  ```
+- Files are merged with `AGENTS.md`.
+
+### Agent and Mode Prompts
+
+- Set custom prompts in config:
+  ```json
+  {
+    "agent": {
+      "review": {
+        "prompt": "{file:./prompts/code-review.txt}"
+      }
+    }
+  }
+  ```
+- Works for agents and modes.
+
+### Precedence
+
+- Project overrides global, but both included.
+- Customize behavior for all agents, specific agents, or modes.
