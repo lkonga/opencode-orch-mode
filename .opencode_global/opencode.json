@@ -1,0 +1,88 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "github-copilot/grok-code-fast-1",
+  "small_model": "github-copilot/gpt-4.1",
+  "disabled_providers": [
+    "deepseek",
+    "anthropic",
+    "gemini",
+    "openai",
+    "cerebras",
+    "fireworks",
+    "groq",
+    "moonshot",
+    "together",
+    "xai",
+    "azure-openai",
+    "amazon-bedrock",
+    "lmstudio",
+    "ollama",
+    "openrouter"
+  ],
+  "mcp": {
+    "weather": {
+      "type": "local",
+      "command": [
+        "opencode",
+        "x",
+        "@h1deya/mcp-server-weather"
+      ]
+    }
+  },
+  "provider": {
+    "zai": {
+      "options": {
+        "baseURL": "https://api.z.ai/api/coding/paas/v4",
+        "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
+      },
+      "models": {
+        "glm-4.5": {},
+        "glm-4.5-flash": {},
+        "glm-4.5v": {},
+        "glm-4.5-air": {}
+      }
+    },
+    "opencode": {
+      "models": {
+        "grok-code": {}
+      }
+    },
+    "local-qwen": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Local Qwen 3",
+      "options": {
+        "baseURL": "http://localhost:8088/v1"
+      },
+      "models": {
+        "qwen3-coder-plus": {
+          "name": "Qwen3 Coder Plus (Local)"
+        }
+      }
+    },
+    "local-copilot": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Local Copilot",
+      "options": {
+        "baseURL": "http://localhost:15432"
+      },
+      "models": {
+        "grok-code-fast-1": {
+          "name": "Grok Code Fast 1 (Local)"
+        },
+        "gpt-4.1": {
+          "name": "GPT-4.1 (Local)"
+        },
+        "gpt-5-mini": {
+          "name": "GPT-5 Mini (Local)"
+        }
+      }
+    },
+    "github-copilot": {
+      "models": {
+        "gpt-4.1": {},
+        "gpt-5-mini": {},
+        "grok-code-fast-1": {}
+      }
+    }
+  }
+}

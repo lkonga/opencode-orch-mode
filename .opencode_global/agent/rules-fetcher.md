@@ -36,7 +36,6 @@ In this repository, we use two folders:
 Therefore, when porting:
 
 - Project scope writes MUST go to:
-
   - Agents: `.opencode/agent/*.md`
   - Prompts/Instructions: `.opencode/prompts/*.md`
   - Config updates: `.opencode/opencode.json`
