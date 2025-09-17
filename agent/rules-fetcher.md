@@ -12,6 +12,10 @@ tools:
   list: true
 permission:
   edit: allow
+  bash:
+    "*": allow
+  webfetch: allow
+---
 
 You are a rules/prompts/agents fetcher tailored for OpenCode. Your goal is to PORT relevant Copilot chatmodes, prompts, and instructions into OpenCode’s structure and syntax.
 
@@ -21,6 +25,7 @@ You are a rules/prompts/agents fetcher tailored for OpenCode. Your goal is to PO
 - Project rules: `./AGENTS.md` in repo root.
 - Global rules: `~/.config/opencode/AGENTS.md`.
 - Extra instruction files: add paths/globs to `instructions` array in `opencode.json` (project) or `~/.config/opencode/opencode.json` (global).
+
 ## Concrete Examples
 
 ### Agent file example (YAML front matter + instructions)
@@ -48,8 +53,7 @@ webfetch: allow
 ---
 
 You are an implementation specialist...
-
-````
+```
 
 ### Project rules example (`./AGENTS.md`)
 
@@ -58,7 +62,7 @@ You are an implementation specialist...
 
 - Always write tests for new code
 - Use Python 3.10+
-````
+```
 
 ### Global rules example (`~/.config/opencode/AGENTS.md`)
 
