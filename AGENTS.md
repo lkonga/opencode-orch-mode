@@ -1,57 +1,44 @@
-# Architecture
+# ORCH Workflow – AI Agent Guide
 
-This project implements the ORCH (Agent Orchestration) workflow for OpenCode, a structured approach to issue resolution through collaborative planning and execution. The system consists of three main components:
+## Architecture (what exists here)
+- Main orchestrator: .opencode_global/command/orch.md (installs as /orch)
+- Sub-agents (singular folder name required): .opencode_global/agent/
+  - @implementor-zai-glm-4-5 → implementation (write + bash)
+  - @reviewer-github-copilot-grok-fast → review (read-only)
+- Inputs/flow: ./issue/<name>.md (problem) → ./plan/<name>.md (approved plan) → implement → review → loop until ≥90% compliance
 
-- **Command Orchestrator**: `command/orch.md` coordinates the entire workflow and installs as `/orch` slash command
-- **Sub-agents**: Specialized agents in `agent/` directory with distinct roles (implementation vs review)
-- **Documentation**: Comprehensive guides in `docs/` explaining workflow phases and configurations
+## Setup & Installation
+- Preferred: symlink this repo’s global config mirror
+  - ln -sfn "$(pwd)/.opencode_global" ~/.config/opencode
+- Alternative (command only): ./install.sh (copies command/orch.md to ~/.config/opencode/command/). In this repo the canonical file is .opencode_global/command/orch.md.
+- Agents must live in ~/.config/opencode/agent/ (singular "agent"). See .opencode_global/agent/*.md for ready configs.
 
-The architecture follows a clear separation of concerns: main agent coordinates, implementation agent executes, review agent evaluates quality. This ensures consistent, high-quality code implementation while maintaining human oversight.
+## How to run the ORCH workflow
+1) Create an issue: ./issue/<name>.md (problem, requirements, expected outcome)
+2) Plan with main agent, then create ./plan/<name>.md with 2 sections:
+   - Plain-English approach (no code, use arrows for clarity)
+   - Detailed, file-by-file implementation steps
+3) Clear context: /new
+4) Execute: /orch "check the issue at ./issue/<name>.md and the plan at ./plan/<name>.md and start the ORCH workflow using @implementor-zai-glm-4-5 as agent_1 and @reviewer-github-copilot-grok-fast as agent_2"
+5) Loop: Implementor executes exactly; Reviewer scores via git diff; iterate until score ≥90%; no commits are made automatically
 
-# Workflows
+## Conventions & Roles (enforced in this repo)
+- Plans are the source of truth; implementor must follow exactly (no unplanned changes)
+- No automatic commits; you decide when to commit
+- Reviewer computes a compliance score (0–100%) by comparing plan vs git diff
+- Folder naming: use agent/ (not agents/)
 
-## ORCH Workflow Execution
-1. **Install**: Run `./install.sh` to copy `command/orch.md` to `~/.config/opencode/command/`
-2. **Issue Creation**: Create issue files in `./issue/` directory with problem descriptions and requirements
-3. **Planning**: Interactive planning session with main agent to create plan files in `./plan/` directory
-4. **Execution**: Run `/orch "check the issue at ./issue/name.md and the plan at ./plan/name.md and start the ORCH workflow using @agent_1 as agent_1 and @agent_2 as agent_2"`
-5. **Quality Loop**: Implementation agent executes plan → Review agent evaluates compliance → Loop until 90%+ score achieved
+## Integration points
+- OpenCode merges project AGENTS.md with global ~/.config/opencode/AGENTS.md
+- Models/providers configured in .opencode_global/opencode.json (override secrets in your own environment)
+- External agent templates available under workspace/external_agents/
 
-## Agent Setup
-Agents must be placed in `~/.config/opencode/agent/` (singular folder name). Use `agent/README.md` for verification and troubleshooting.
+## Key files to open first
+- Orchestrator: .opencode_global/command/orch.md
+- Agents: .opencode_global/agent/implementor-zai-glm-4-5.md, .opencode_global/agent/reviewer-github-copilot-grok-fast.md
+- How-tos: docs/orch-workflow.md, docs/usage-examples.md, docs/agent-configuration.md, README.md
 
-# Conventions
-
-## File Structure
-- Issue files: `./issue/<name>.md` - Problem descriptions with requirements and expected outcomes
-- Plan files: `./plan/<name>.md` - Two-section format: plain English explanation + detailed implementation steps
-- Agent configs: `agent/*.md` - YAML frontmatter with model, tools, permissions, and role instructions
-
-## Agent Roles
-- **Implementation Agent** (`@implementor-zai-glm-4-5`): Low temperature (0.1), full write permissions, executes plans exactly
-- **Review Agent** (`@reviewer-github-copilot-grok-fast`): Moderate temperature (0.3), read-only, calculates compliance scores
-- **Main Agent**: Coordinates workflow, never codes directly
-
-## Quality Standards
-- 90%+ compliance threshold required for workflow completion
-- Review agents use git diff to compare implementation vs plan
-- No automatic commits - user controls all commit decisions
-- Plans are source of truth - implementors follow exactly without deviations
-
-# Integration Points
-
-## OpenCode Runtime
-- Commands installed to `~/.config/opencode/command/`
-- Agents configured in `~/.config/opencode/agent/`
-- Supports custom instruction files via `opencode.json`
-
-## External Dependencies
-- Git integration for diff-based review process
-- Model providers: ZAI (glm-4.5), GitHub Copilot (grok-code-fast-1)
-- External agent templates in `workspace/external_agents/` for additional model support
-
-## Key Files
-- Workflow orchestrator: `command/orch.md`
-- Agent configurations: `agent/implementor-zai-glm-4-5.md`, `agent/reviewer-github-copilot-grok-fast.md`
-- Documentation: `docs/orch-workflow.md`, `docs/usage-examples.md`, `docs/agent-configuration.md`
-- Installation: `install.sh`
+## Troubleshooting
+- “Agent not found”: ensure ~/.config/opencode/agent/ exists (singular) or recreate the symlink above
+- Low compliance/loops: simplify plan or split into multiple issue/plan pairs
+- Install issues: prefer the symlink method; verify .opencode_global/command/orch.md is visible under ~/.config/opencode/command/

@@ -1,6 +1,6 @@
+---
 description: "Copilot instructions for ORCH workflow in this repo"
 applyTo: ".github/copilot-instructions.md"
-
 ---
 
 ## Purpose
