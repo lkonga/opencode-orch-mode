@@ -118,6 +118,7 @@
         "glm-4.5-air": {},
         "glm-4.7": {},
         "glm-4.7-thinking": {
+          "id": "glm-4.7",
           "name": "GLM-4.7 Thinking",
           "options": {
             "thinking": {
@@ -127,6 +128,7 @@
           }
         },
         "glm-4.7-fast": {
+          "id": "glm-4.7",
           "name": "GLM-4.7 Fast",
           "options": {
             "thinking": {
