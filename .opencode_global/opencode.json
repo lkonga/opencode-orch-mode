@@ -117,17 +117,13 @@
         "glm-4.5v": {},
         "glm-4.5-air": {},
         "glm-4.7": {
-          "name": "GLM-4.7",
-          "reasoning": true,
-          "tool_call": true,
-          "variants": {
-            "standard": {
-              "reasoning": false
-            },
-            "thinking": {
-              "reasoning": true
-            }
-          }
+          "name": "GLM-4.7"
+        },
+        "glm-4.7-standard": {
+          "name": "GLM-4.7 Standard"
+        },
+        "glm-4.7-thinking": {
+          "name": "GLM-4.7 Thinking"
         }
       }
     },
@@ -209,22 +205,22 @@
   },
   "agent": {
     "general": {
-      "model": "zai/glm-4.7:standard",
+      "model": "zai/glm-4.7-standard",
       "description": "General-purpose agent for researching and multi-step tasks"
     },
     "build": {
-      "model": "zai/glm-4.7:thinking",
+      "model": "zai/glm-4.7-thinking",
       "description": "Build agent with reasoning enabled for complex development tasks"
     },
     "expert": {
       "description": "Expert subagent for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
       "mode": "subagent",
-      "model": "zai/glm-4.7:thinking"
+      "model": "zai/glm-4.7-thinking"
     },
     "normal": {
       "description": "Normal subagent for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
       "mode": "subagent",
-      "model": "zai/glm-4.7:standard"
+      "model": "zai/glm-4.7-standard"
     }
   }
 }
