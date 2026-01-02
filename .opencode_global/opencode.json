@@ -234,5 +234,8 @@
       "model": "zai/glm-4.7-fast"
     }
   },
-  "default_agent": "general"
+  "default_agent": "general",
+  "keybinds": {
+    "app_exit": "<leader>q"
+  }
 }
