@@ -19,13 +19,92 @@
     "openrouter"
   ],
   "mcp": {
-    "weather": {
+    "markitdown": {
       "type": "local",
       "command": [
-        "opencode",
-        "x",
-        "@h1deya/mcp-server-weather"
-      ]
+        "uvx",
+        "--python",
+        "3.12",
+        "--from",
+        "markitdown-mcp==0.0.1a4",
+        "markitdown-mcp"
+      ],
+      "enabled": true
+    },
+    "brave-search": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@brave/brave-search-mcp-server",
+        "--transport",
+        "stdio"
+      ],
+      "environment": {
+        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}"
+      },
+      "enabled": true
+    },
+    "time": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "mcp-server-time",
+        "--local-timezone=Asia/Bangkok"
+      ],
+      "enabled": true
+    },
+    "searxng-search": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "--python",
+        "3.11",
+        "--with",
+        "fastmcp",
+        "--with",
+        "httpx",
+        "--from",
+        "fastmcp",
+        "python",
+        "/home/lkonga/codes/llm-rules/mcp-docker/scripts/searxng-remote-fastmcp.py"
+      ],
+      "environment": {
+        "SEARXNG_HOST": "192.168.1.100",
+        "SEARXNG_PORT": "11236",
+        "SEARXNG_SSH_HOST": "g5kc_lan",
+        "SEARXNG_CONTAINER": "mcp-searxng",
+        "SEARXNG_AUTO_START": "true",
+        "SEARXNG_MCP_DEFAULT_RESULT_COUNT": "10",
+        "SEARXNG_MCP_DEFAULT_LANGUAGE": "all"
+      },
+      "enabled": true
+    },
+    "crawl4ai": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "--python",
+        "3.11",
+        "--with",
+        "fastmcp",
+        "--with",
+        "httpx",
+        "--from",
+        "fastmcp",
+        "python",
+        "/home/lkonga/codes/llm-rules/mcp-docker/scripts/crawl4ai-remote-fastmcp.py"
+      ],
+      "environment": {
+        "CRAWL4AI_HOST": "192.168.1.100",
+        "CRAWL4AI_PORT": "11235",
+        "CRAWL4AI_SSH_HOST": "g5kc_lan",
+        "CRAWL4AI_CONTAINER": "mcp-crawl4ai",
+        "CRAWL4AI_AUTO_START": "true",
+        "CRAWL4AI_STARTUP_WAIT": "30",
+        "CRAWL4AI_HEALTH_INTERVAL": "5"
+      },
+      "enabled": true
     }
   },
   "provider": {
