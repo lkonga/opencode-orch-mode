@@ -127,5 +127,15 @@
         }
       }
     }
+  },
+  "agent": {
+    "general": {
+      "model": "zai/glm-4.7/standard",
+      "description": "General-purpose agent for researching and multi-step tasks"
+    },
+    "build": {
+      "model": "zai/glm-4.7/thinking",
+      "description": "Build agent with reasoning enabled for complex development tasks"
+    }
   }
 }
