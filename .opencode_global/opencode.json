@@ -198,21 +198,35 @@
   "agent": {
     "general": {
       "model": "zai/glm-4.7",
-      "description": "General-purpose agent for researching and multi-step tasks"
+      "description": "General-purpose agent for researching and multi-step tasks",
+      "thinking": {
+        "type": "disabled"
+      }
     },
     "build": {
       "model": "zai/glm-4.7",
-      "description": "Build agent with reasoning enabled for complex development tasks"
+      "description": "Build agent with reasoning enabled for complex development tasks",
+      "thinking": {
+        "type": "enabled",
+        "clear_thinking": false
+      }
     },
     "expert": {
       "description": "Expert subagent for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
       "mode": "subagent",
-      "model": "zai/glm-4.7"
+      "model": "zai/glm-4.7",
+      "thinking": {
+        "type": "enabled",
+        "clear_thinking": false
+      }
     },
     "normal": {
       "description": "Normal subagent for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
       "mode": "subagent",
-      "model": "zai/glm-4.7"
+      "model": "zai/glm-4.7",
+      "thinking": {
+        "type": "disabled"
+      }
     }
   }
 }
