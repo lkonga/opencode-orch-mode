@@ -36,11 +36,11 @@
       "command": [
         "npx",
         "-y",
-        "@brave/brave-search-mcp-server"
+        "@brave/brave-search-mcp-server",
+        "--brave-api-key",
+        "{env:BRAVE_SEARCH_API_KEY}"
       ],
-      "environment": {
-        "BRAVE_API_KEY": "{env:BRAVE_SEARCH_API_KEY}"
-      },
+      "environment": {},
       "enabled": true
     },
     "time": {
