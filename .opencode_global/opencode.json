@@ -41,11 +41,14 @@
         "glm-4.5-air": {},
         "glm-4.7": {
           "name": "GLM-4.7",
-          "reasoning": false
-        },
-        "glm-4.7-thinking": {
-          "name": "GLM-4.7",
-          "reasoning": true
+          "variants": {
+            "standard": {
+              "reasoning": false
+            },
+            "thinking": {
+              "reasoning": true
+            }
+          }
         }
       }
     },
