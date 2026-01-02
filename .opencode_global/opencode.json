@@ -238,5 +238,6 @@
   "keybinds": {
     "app_exit": "<leader>q",
     "leader": "ctrl+x"
-  }
+  },
+  "theme": "catppuccin"
 }
