@@ -216,11 +216,11 @@
   },
   "agent": {
     "general": {
-      "model": "zai/glm-4.7-fast",
+      "model": "zai/glm-4.7",
       "description": "General-purpose agent for researching and multi-step tasks"
     },
     "build": {
-      "model": "zai/glm-4.7-thinking",
+      "model": "zai/glm-4.7",
       "description": "Build agent with reasoning enabled for complex development tasks"
     },
     "expert": {
@@ -233,5 +233,6 @@
       "mode": "subagent",
       "model": "zai/glm-4.7-fast"
     }
-  }
+  },
+  "default_agent": "general"
 }
