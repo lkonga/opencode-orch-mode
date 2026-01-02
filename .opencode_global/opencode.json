@@ -236,6 +236,7 @@
   },
   "default_agent": "general",
   "keybinds": {
-    "app_exit": "<leader>q"
+    "app_exit": "<leader>q",
+    "leader": "ctrl+x"
   }
 }
