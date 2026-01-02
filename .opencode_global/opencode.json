@@ -40,6 +40,9 @@
         "glm-4.5v": {},
         "glm-4.5-air": {},
         "glm-4.7": {
+          "name": "GLM-4.7"
+        },
+        "glm-4.7-thinking": {
           "name": "GLM-4.7 (Thinking)",
           "reasoning": true
         }
