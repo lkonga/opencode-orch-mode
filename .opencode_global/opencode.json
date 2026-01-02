@@ -42,7 +42,15 @@
         "glm-4.7": {
           "name": "GLM-4.7",
           "reasoning": true,
-          "tool_call": true
+          "tool_call": true,
+          "variants": {
+            "standard": {
+              "reasoning": false
+            },
+            "thinking": {
+              "reasoning": true
+            }
+          }
         }
       }
     },
@@ -124,14 +132,12 @@
   },
   "agent": {
     "general": {
-      "model": "zai/glm-4.7",
-      "description": "General-purpose agent for researching and multi-step tasks",
-      "reasoning": false
+      "model": "zai/glm-4.7/standard",
+      "description": "General-purpose agent for researching and multi-step tasks"
     },
     "build": {
-      "model": "zai/glm-4.7",
-      "description": "Build agent with reasoning enabled for complex development tasks",
-      "reasoning": true
+      "model": "zai/glm-4.7/thinking",
+      "description": "Build agent with reasoning enabled for complex development tasks"
     }
   }
 }
