@@ -39,7 +39,7 @@
         "@brave/brave-search-mcp-server"
       ],
       "environment": {
-        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}"
+        "BRAVE_API_KEY": "{env:BRAVE_SEARCH_API_KEY}"
       },
       "enabled": true
     },
