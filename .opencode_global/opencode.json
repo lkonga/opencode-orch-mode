@@ -133,6 +133,24 @@
             "output": 128000
           }
         },
+        "glm-4.7-default": {
+          "id": "glm-4.7",
+          "name": "GLM-4.7 Default",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
+        },
         "glm-4.7-thinking": {
           "id": "glm-4.7",
           "name": "GLM-4.7 Thinking",
@@ -151,9 +169,7 @@
             "output": 128000
           },
           "options": {
-            "thinking": {
-              "type": "enabled"
-            }
+            "thinking": true
           }
         },
         "glm-4.7-fast": {
@@ -162,7 +178,7 @@
           "attachment": false,
           "reasoning": true,
           "temperature": true,
-          "tool_call": true,
+          "tool_call: true,
           "cost": {
             "input": 0,
             "output": 0,
@@ -174,9 +190,7 @@
             "output": 128000
           },
           "options": {
-            "thinking": {
-              "type": "disabled"
-            }
+            "thinking": false
           }
         }
       }
@@ -259,8 +273,8 @@
   },
   "agent": {
     "general": {
-      "model": "zai/glm-4.7",
-      "description": "General-purpose agent for researching and multi-step tasks"
+      "model": "zai/glm-4.7-default",
+      "description": "General-purpose agent with automatic thinking - model decides when to use thinking"
     },
     "build": {
       "model": "zai/glm-4.7",
