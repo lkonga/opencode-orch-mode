@@ -278,7 +278,8 @@
     },
     "build": {
       "model": "zai/glm-4.7",
-      "description": "Build agent with reasoning enabled for complex development tasks"
+      "mode": "subagent",
+      "description": "Build subagent with reasoning enabled for complex development tasks"
     },
     "expert": {
       "description": "Expert subagent with thinking enabled for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
