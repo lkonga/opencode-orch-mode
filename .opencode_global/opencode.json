@@ -152,8 +152,7 @@
           },
           "options": {
             "thinking": {
-              "type": "enabled",
-              "budget_tokens": 16000
+              "type": "enabled"
             }
           }
         },
