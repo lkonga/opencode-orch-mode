@@ -29,7 +29,7 @@
         "markitdown-mcp==0.0.1a4",
         "markitdown-mcp"
       ],
-      "enabled": true
+      "enabled": false
     },
     "brave-search": {
       "type": "local",
@@ -41,7 +41,7 @@
         "{env:BRAVE_SEARCH_API_KEY}"
       ],
       "environment": {},
-      "enabled": true
+      "enabled": false
     },
     "time": {
       "type": "local",
@@ -50,7 +50,7 @@
         "mcp-server-time",
         "--local-timezone=Asia/Bangkok"
       ],
-      "enabled": true
+      "enabled": false
     },
     "searxng-search": {
       "type": "local",
@@ -76,7 +76,7 @@
         "SEARXNG_MCP_DEFAULT_RESULT_COUNT": "10",
         "SEARXNG_MCP_DEFAULT_LANGUAGE": "all"
       },
-      "enabled": true
+      "enabled": false
     },
     "crawl4ai": {
       "type": "local",
@@ -102,7 +102,16 @@
         "CRAWL4AI_STARTUP_WAIT": "30",
         "CRAWL4AI_HEALTH_INTERVAL": "5"
       },
-      "enabled": true
+      "enabled": false
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ],
+      "enabled": false
     }
   },
   "provider": {
