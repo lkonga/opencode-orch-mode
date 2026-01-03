@@ -108,9 +108,9 @@
   "provider": {
     "zai": {
       "name": "Z.AI",
-      "npm": "@ai-sdk/anthropic",
+      "npm": "@ai-sdk/openai",
       "options": {
-        "baseURL": "https://api.z.ai/api/anthropic/v1",
+        "baseURL": "https://api.z.ai/api/paas/v4",
         "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
       },
       "models": {
@@ -167,6 +167,11 @@
           "limit": {
             "context": 200000,
             "output": 128000
+          },
+          "options": {
+            "thinking": {
+              "type": "enabled"
+            }
           }
         },
         "glm-4.7-fast": {
@@ -185,6 +190,11 @@
           "limit": {
             "context": 200000,
             "output": 128000
+          },
+          "options": {
+            "thinking": {
+              "type": "disabled"
+            }
           }
         }
       }
