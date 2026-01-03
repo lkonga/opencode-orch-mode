@@ -108,66 +108,29 @@
   "provider": {
     "zai": {
       "name": "Z.AI",
-      "npm": "@ai-sdk/anthropic",
+      "npm": "@ai-sdk/openai-compatible",
       "options": {
-        "baseURL": "https://api.z.ai/api/anthropic/v1",
+        "baseURL": "https://api.z.ai/api/coding/paas/v4",
         "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
       },
       "models": {
         "glm-4.7": {
           "id": "glm-4.7",
           "name": "GLM-4.7",
-          "attachment": false,
           "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "release_date": "2025-12-01",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache_read": 0,
-            "cache_write": 0
-          },
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          }
+          "tool_call": true
         },
         "glm-4.7-thinking": {
           "id": "glm-4.7",
           "name": "GLM-4.7 Thinking",
-          "attachment": false,
           "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache_read": 0,
-            "cache_write": 0
-          },
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          }
+          "tool_call": true
         },
         "glm-4.7-fast": {
           "id": "glm-4.7",
           "name": "GLM-4.7 Fast",
-          "attachment": false,
           "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache_read": 0,
-            "cache_write": 0
-          },
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          }
+          "tool_call": true
         }
       }
     },
