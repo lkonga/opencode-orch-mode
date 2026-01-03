@@ -131,8 +131,7 @@
           "limit": {
             "context": 200000,
             "output": 128000
-          },
-          "options": {}
+          }
         },
         "glm-4.7-thinking": {
           "id": "glm-4.7",
@@ -150,6 +149,12 @@
           "limit": {
             "context": 200000,
             "output": 128000
+          },
+          "options": {
+            "thinking": {
+              "type": "enabled",
+              "budget_tokens": 16000
+            }
           }
         },
         "glm-4.7-fast": {
@@ -168,6 +173,11 @@
           "limit": {
             "context": 200000,
             "output": 128000
+          },
+          "options": {
+            "thinking": {
+              "type": "disabled"
+            }
           }
         }
       }
@@ -258,16 +268,14 @@
       "description": "Build agent with reasoning enabled for complex development tasks"
     },
     "expert": {
-      "description": "Expert subagent for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
+      "description": "Expert subagent with thinking enabled for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
       "mode": "subagent",
-      "model": "zai/glm-4.7-thinking",
-      "systemPrompt": "You are an expert coding assistant with deep analytical capabilities. Take time to think carefully through complex problems. Consider multiple approaches, analyze trade-offs, and provide detailed reasoning before proposing solutions. Use interleaved thinking to work through architectural decisions, complex debugging, and multi-step problems. Your responses should be thorough and well-reasoned."
+      "model": "zai/glm-4.7-thinking"
     },
     "normal": {
-      "description": "Normal subagent for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
+      "description": "Normal subagent with thinking disabled for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
       "mode": "subagent",
-      "model": "zai/glm-4.7-fast",
-      "systemPrompt": "You are a quick and efficient coding assistant. Respond directly and efficiently without overthinking simple tasks. Focus on getting things done quickly while maintaining accuracy. For routine operations like file searches, simple code changes, and straightforward questions, provide concise answers and take immediate action."
+      "model": "zai/glm-4.7-fast"
     }
   },
   "default_agent": "general",
