@@ -108,29 +108,67 @@
   "provider": {
     "zai": {
       "name": "Z.AI",
-      "npm": "@ai-sdk/openai-compatible",
+      "npm": "@ai-sdk/anthropic",
       "options": {
-        "baseURL": "https://api.z.ai/api/coding/paas/v4",
+        "baseURL": "https://api.z.ai/api/anthropic/v1",
         "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
       },
       "models": {
         "glm-4.7": {
           "id": "glm-4.7",
           "name": "GLM-4.7",
+          "attachment": false,
           "reasoning": true,
-          "tool_call": true
+          "temperature": true,
+          "tool_call": true,
+          "release_date": "2025-12-01",
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          },
+          "options": {}
         },
         "glm-4.7-thinking": {
           "id": "glm-4.7",
           "name": "GLM-4.7 Thinking",
+          "attachment": false,
           "reasoning": true,
-          "tool_call": true
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
         },
         "glm-4.7-fast": {
           "id": "glm-4.7",
           "name": "GLM-4.7 Fast",
+          "attachment": false,
           "reasoning": true,
-          "tool_call": true
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
         }
       }
     },
@@ -222,12 +260,14 @@
     "expert": {
       "description": "Expert subagent for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
       "mode": "subagent",
-      "model": "zai/glm-4.7-thinking"
+      "model": "zai/glm-4.7-thinking",
+      "systemPrompt": "You are an expert coding assistant with deep analytical capabilities. Take time to think carefully through complex problems. Consider multiple approaches, analyze trade-offs, and provide detailed reasoning before proposing solutions. Use interleaved thinking to work through architectural decisions, complex debugging, and multi-step problems. Your responses should be thorough and well-reasoned."
     },
     "normal": {
       "description": "Normal subagent for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
       "mode": "subagent",
-      "model": "zai/glm-4.7-fast"
+      "model": "zai/glm-4.7-fast",
+      "systemPrompt": "You are a quick and efficient coding assistant. Respond directly and efficiently without overthinking simple tasks. Focus on getting things done quickly while maintaining accuracy. For routine operations like file searches, simple code changes, and straightforward questions, provide concise answers and take immediate action."
     }
   },
   "default_agent": "general",
