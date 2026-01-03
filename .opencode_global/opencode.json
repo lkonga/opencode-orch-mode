@@ -167,11 +167,6 @@
           "limit": {
             "context": 200000,
             "output": 128000
-          },
-          "options": {
-            "thinking": {
-              "type": "enabled"
-            }
           }
         },
         "glm-4.7-fast": {
@@ -190,11 +185,6 @@
           "limit": {
             "context": 200000,
             "output": 128000
-          },
-          "options": {
-            "thinking": {
-              "type": "disabled"
-            }
           }
         }
       }
