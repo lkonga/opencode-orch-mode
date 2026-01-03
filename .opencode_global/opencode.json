@@ -184,26 +184,26 @@
   },
   "agent": {
     "general": {
-      "model": "github-copilot/gpt-5-mini",
+      "model": "zai-coding-plan/glm-4.7",
       "description": "General-purpose agent"
     },
     "build": {
-      "model": "github-copilot/gpt-5-mini",
+      "model": "zai-coding-plan/glm-4.7",
       "description": "Build agent for development tasks"
     },
     "readme": {
-      "model": "github-copilot/gpt-5-mini",
+      "model": "zai-coding-plan/glm-4.7",
       "description": "Documentation agent for README and documentation tasks"
     },
     "expert": {
       "description": "Expert subagent for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
       "mode": "subagent",
-      "model": "github-copilot/gpt-4.1"
+      "model": "zai-coding-plan/glm-4.7"
     },
     "normal": {
       "description": "Normal subagent for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
       "mode": "subagent",
-      "model": "github-copilot/grok-code-fast-1"
+      "model": "zai-coding-plan/glm-4.7"
     }
   },
   "default_agent": "general",
