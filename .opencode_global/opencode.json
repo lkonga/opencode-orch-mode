@@ -133,24 +133,6 @@
             "output": 128000
           }
         },
-        "glm-4.7-default": {
-          "id": "glm-4.7",
-          "name": "GLM-4.7 Default",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache_read": 0,
-            "cache_write": 0
-          },
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          }
-        },
         "glm-4.7-thinking": {
           "id": "glm-4.7",
           "name": "GLM-4.7 Thinking",
@@ -277,15 +259,15 @@
   },
   "agent": {
     "general": {
-      "model": "zai/glm-4.7-default",
+      "model": "zai/glm-4.7",
       "description": "General-purpose agent with automatic thinking - model decides when to use thinking"
     },
     "build": {
-      "model": "zai/glm-4.7-default",
+      "model": "zai/glm-4.7",
       "description": "Build agent with automatic thinking for complex development tasks"
     },
     "readme": {
-      "model": "zai/glm-4.7-default",
+      "model": "zai/glm-4.7",
       "description": "Documentation agent for README and documentation tasks with automatic thinking"
     },
     "expert": {
