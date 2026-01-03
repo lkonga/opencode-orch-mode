@@ -142,8 +142,7 @@
           "tool_call": true,
           "options": {
             "thinking": {
-              "type": "enabled",
-              "clear_thinking": false
+              "type": "enabled"
             }
           },
           "cost": {
