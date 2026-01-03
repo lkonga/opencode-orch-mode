@@ -106,81 +106,6 @@
     }
   },
   "provider": {
-    "zai": {
-      "name": "Z.AI",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "baseURL": "https://api.z.ai/api/coding/paas/v4",
-        "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
-      },
-      "models": {
-        "glm-4.7": {
-          "id": "glm-4.7",
-          "name": "GLM-4.7",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "release_date": "2025-12-01",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache_read": 0,
-            "cache_write": 0
-          },
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          }
-        },
-        "glm-4.7-thinking": {
-          "id": "glm-4.7",
-          "name": "GLM-4.7 Thinking",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache_read": 0,
-            "cache_write": 0
-          },
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          },
-          "options": {
-            "thinking": {
-              "type": "enabled"
-            }
-          }
-        },
-        "glm-4.7-fast": {
-          "id": "glm-4.7",
-          "name": "GLM-4.7 Fast",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache_read": 0,
-            "cache_write": 0
-          },
-          "limit": {
-            "context": 200000,
-            "output": 128000
-          },
-          "options": {
-            "thinking": {
-              "type": "disabled"
-            }
-          }
-        }
-      }
-    },
     "chutes": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Chutes.ai",
@@ -259,26 +184,26 @@
   },
   "agent": {
     "general": {
-      "model": "zai/glm-4.7",
-      "description": "General-purpose agent with automatic thinking - model decides when to use thinking"
+      "model": "github-copilot/gpt-5-mini",
+      "description": "General-purpose agent"
     },
     "build": {
-      "model": "zai/glm-4.7",
-      "description": "Build agent with automatic thinking for complex development tasks"
+      "model": "github-copilot/gpt-5-mini",
+      "description": "Build agent for development tasks"
     },
     "readme": {
-      "model": "zai/glm-4.7",
-      "description": "Documentation agent for README and documentation tasks with automatic thinking"
+      "model": "github-copilot/gpt-5-mini",
+      "description": "Documentation agent for README and documentation tasks"
     },
     "expert": {
-      "description": "Expert subagent with thinking enabled for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
+      "description": "Expert subagent for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
       "mode": "subagent",
-      "model": "zai/glm-4.7-thinking"
+      "model": "github-copilot/gpt-4.1"
     },
     "normal": {
-      "description": "Normal subagent with thinking disabled for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
+      "description": "Normal subagent for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
       "mode": "subagent",
-      "model": "zai/glm-4.7-fast"
+      "model": "github-copilot/grok-code-fast-1"
     }
   },
   "default_agent": "general",
