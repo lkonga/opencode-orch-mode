@@ -29,7 +29,7 @@
         "markitdown-mcp==0.0.1a4",
         "markitdown-mcp"
       ],
-      "enabled": false
+      "enabled": true
     },
     "brave-search": {
       "type": "local",
@@ -41,7 +41,7 @@
         "{env:BRAVE_SEARCH_API_KEY}"
       ],
       "environment": {},
-      "enabled": false
+      "enabled": true
     },
     "time": {
       "type": "local",
@@ -50,7 +50,7 @@
         "mcp-server-time",
         "--local-timezone=Asia/Bangkok"
       ],
-      "enabled": false
+      "enabled": true
     },
     "searxng-search": {
       "type": "local",
@@ -76,7 +76,7 @@
         "SEARXNG_MCP_DEFAULT_RESULT_COUNT": "10",
         "SEARXNG_MCP_DEFAULT_LANGUAGE": "all"
       },
-      "enabled": false
+      "enabled": true
     },
     "crawl4ai": {
       "type": "local",
@@ -102,7 +102,7 @@
         "CRAWL4AI_STARTUP_WAIT": "30",
         "CRAWL4AI_HEALTH_INTERVAL": "5"
       },
-      "enabled": false
+      "enabled": true
     },
     "playwright": {
       "type": "local",
