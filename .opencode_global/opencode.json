@@ -110,7 +110,7 @@
       "name": "Z.AI",
       "npm": "@ai-sdk/openai-compatible",
       "options": {
-        "baseURL": "https://api.z.ai/api/paas/v4",
+        "baseURL": "https://api.z.ai/api/coding/paas/v4",
         "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
       },
       "models": {
