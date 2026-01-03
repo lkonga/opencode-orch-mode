@@ -169,7 +169,9 @@
             "output": 128000
           },
           "options": {
-            "thinking": true
+            "thinking": {
+              "type": "enabled"
+            }
           }
         },
         "glm-4.7-fast": {
@@ -190,7 +192,9 @@
             "output": 128000
           },
           "options": {
-            "thinking": false
+            "thinking": {
+              "type": "disabled"
+            }
           }
         }
       }
