@@ -140,11 +140,6 @@
           "reasoning": true,
           "temperature": true,
           "tool_call": true,
-          "options": {
-            "thinking": {
-              "type": "enabled"
-            }
-          },
           "cost": {
             "input": 0,
             "output": 0,
@@ -163,11 +158,6 @@
           "reasoning": true,
           "temperature": true,
           "tool_call": true,
-          "options": {
-            "thinking": {
-              "type": "disabled"
-            }
-          },
           "cost": {
             "input": 0,
             "output": 0,
