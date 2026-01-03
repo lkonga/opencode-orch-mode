@@ -29,9 +29,6 @@
         "markitdown-mcp==0.0.1a4",
         "markitdown-mcp"
       ],
-      "environment": {
-        "PATH": "{env:HOME}/.local/bin:{env:HOME}/.nvm/versions/node/v24.12.0/bin:{env:PATH}"
-      },
       "enabled": true
     },
     "brave-search": {
@@ -43,9 +40,7 @@
         "--brave-api-key",
         "{env:BRAVE_SEARCH_API_KEY}"
       ],
-      "environment": {
-        "PATH": "{env:HOME}/.local/bin:{env:HOME}/.nvm/versions/node/v24.12.0/bin:{env:PATH}"
-      },
+      "environment": {},
       "enabled": true
     },
     "time": {
@@ -55,9 +50,6 @@
         "mcp-server-time",
         "--local-timezone=Asia/Bangkok"
       ],
-      "environment": {
-        "PATH": "{env:HOME}/.local/bin:{env:HOME}/.nvm/versions/node/v24.12.0/bin:{env:PATH}"
-      },
       "enabled": true
     },
     "searxng-search": {
@@ -76,7 +68,6 @@
         "/home/lkonga/codes/llm-rules/mcp-docker/scripts/searxng-remote-fastmcp.py"
       ],
       "environment": {
-        "PATH": "{env:HOME}/.local/bin:{env:HOME}/.nvm/versions/node/v24.12.0/bin:{env:PATH}",
         "SEARXNG_HOST": "192.168.1.100",
         "SEARXNG_PORT": "11236",
         "SEARXNG_SSH_HOST": "g5kc_lan",
@@ -103,7 +94,6 @@
         "/home/lkonga/codes/llm-rules/mcp-docker/scripts/crawl4ai-remote-fastmcp.py"
       ],
       "environment": {
-        "PATH": "{env:HOME}/.local/bin:{env:HOME}/.nvm/versions/node/v24.12.0/bin:{env:PATH}",
         "CRAWL4AI_HOST": "192.168.1.100",
         "CRAWL4AI_PORT": "11235",
         "CRAWL4AI_SSH_HOST": "g5kc_lan",
