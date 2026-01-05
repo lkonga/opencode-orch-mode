@@ -30,6 +30,6 @@ Provide brief second opinions with:
 - Clear recommendation
 
 **Difference from other reviewers**:
-- @reviewer (MiniMax) - Focused code review
-- @expert (GLM-4.7 + ultrathink) - Deep comprehensive analysis
-- @quickReviewer (GPT-5.2) - Rapid second opinion and validation
+- @reviewer (GPT-5.2) - Comprehensive code review
+- @expert (GPT-5.2) - Deep comprehensive analysis
+- @quickReviewer (MiniMax) - Rapid second opinion and validation
