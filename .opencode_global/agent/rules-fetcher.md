@@ -2,7 +2,6 @@
 description: "Rules, prompts, and agents fetcher for OpenCode. Ports VS Code Copilot chatmodes to OpenCode format."
 mode: subagent
 model: "github-copilot/gpt-5"
-temperature: 0.1
 # Tools expected by OpenCode (examples from implementor agent)
 tools:
   bash: true
@@ -58,7 +57,6 @@ Place at `~/.config/opencode/agent/my-agent.md`:
 description: Implementation specialist for ORCH workflow - executes development plans exactly as specified
 mode: subagent
 model: zai/glm-4.5
-temperature: 0.1
 tools:
 bash: true
 list: true
@@ -149,7 +147,6 @@ Skip generic or irrelevant items that don’t map to the project stack.
 description: "<Short role | purpose>"
 mode: subagent
 model: github-copilot/grok-code-fast-1
-temperature: 0.1
 tools:
   bash: true
   edit: true
@@ -287,7 +284,6 @@ opencode run --agent rules-fetcher "fetch relevant rules for app development in 
 description: General-purpose code review agent for all projects
 mode: subagent
 model: github-copilot/grok-code-fast-1
-temperature: 0.1
 tools:
   read: true
   grep: true

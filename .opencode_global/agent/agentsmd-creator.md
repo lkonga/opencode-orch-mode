@@ -2,7 +2,6 @@
 description: "Agent for analyzing codebase and generating AGENTS.md with project-specific instructions"
 mode: subagent
 model: "github-copilot/gpt-5"
-temperature: 0.3
 tools:
   read: true
   list: true

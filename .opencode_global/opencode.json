@@ -134,7 +134,30 @@
       "models": {
         "zai-org/GLM-4.5-turbo": {},
         "moonshotai/Kimi-K2-Instruct-0905": {},
-        "Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8": {}
+        "Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8": {},
+        "MiniMaxAI/MiniMax-M2.1-TEE": {
+          "options": {
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 40
+          }
+        }
+      }
+    },
+    "zai-coding-plan": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Z.AI Coding Plan",
+      "options": {
+        "baseURL": "https://api.z.ai/api/coding/paas/v4",
+        "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
+      },
+      "models": {
+        "glm-4.7": {
+          "options": {
+            "topP": 0.95,
+            "temperature": 0.7
+          }
+        }
       }
     },
     "opencode": {
@@ -176,6 +199,11 @@
       "models": {
         "gpt-4.1": {},
         "gpt-5-mini": {},
+        "gpt-5.2": {
+          "options": {
+            "temperature": 0
+          }
+        },
         "grok-code-fast-1": {}
       }
     },
@@ -209,19 +237,50 @@
       "model": "zai-coding-plan/glm-4.7",
       "description": "Build agent for development tasks"
     },
-    "readme": {
-      "model": "zai-coding-plan/glm-4.7",
-      "description": "Documentation agent for README and documentation tasks"
-    },
     "expert": {
       "description": "Expert subagent for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
       "mode": "subagent",
-      "model": "zai-coding-plan/glm-4.7"
+      "model": "github-copilot/gpt-5.2"
     },
     "normal": {
       "description": "Normal subagent for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
       "mode": "subagent",
       "model": "zai-coding-plan/glm-4.7"
+    },
+    "explore": {
+      "description": "Codebase discovery agent for parallel discovery - analyzes structure, finds patterns, identifies modification targets",
+      "mode": "subagent",
+      "model": "chutes/MiniMaxAI/MiniMax-M2.1-TEE"
+    },
+    "coder": {
+      "description": "Implementation specialist for executing development plans and code modifications. Delegates to @explore for context discovery.",
+      "mode": "subagent",
+      "model": "github-copilot/gpt-5.2"
+    },
+    "repositoryAnalyst": {
+      "description": "Deep codebase analyst with ultrathink - comprehensive analysis, architectural reviews, long-form reasoning",
+      "mode": "subagent",
+      "model": "github-copilot/gpt-5.2"
+    },
+    "reviewer": {
+      "description": "Comprehensive code reviewer - detailed reviews with thorough analysis and enhanced assessment",
+      "mode": "subagent",
+      "model": "github-copilot/gpt-5.2"
+    },
+    "summarizer": {
+      "description": "Session summarizer - condenses subagent sessions for main agent orchestration",
+      "mode": "subagent",
+      "model": "chutes/MiniMaxAI/MiniMax-M2.1-TEE"
+    },
+    "PromptEnhancer": {
+      "description": "Expert metaprompter - enhances prompts with context, clarity, and detail for high-quality subagent tasks",
+      "mode": "subagent",
+      "model": "chutes/MiniMaxAI/MiniMax-M2.1-TEE"
+    },
+    "quickReviewer": {
+      "description": "Rapid first-pass reviewer - fast assessments for initial validation and quick feedback",
+      "mode": "subagent",
+      "model": "chutes/MiniMaxAI/MiniMax-M2.1-TEE"
     }
   },
   "default_agent": "general",

@@ -3,6 +3,8 @@
 ## Architecture (what exists here)
 - Main orchestrator: .opencode_global/command/orch.md (installs as /orch)
 - Sub-agents (singular folder name required): .opencode_global/agent/
+  - @coder → implementation specialist (GPT-5.2, write + bash)
+  - @explore → codebase explorer (MiniMax, read-only)
   - @implementor-zai-glm-4-5 → implementation (write + bash)
   - @reviewer-github-copilot-grok-fast → review (read-only)
 - Inputs/flow: ./issue/<name>.md (problem) → ./plan/<name>.md (approved plan) → implement → review → loop until ≥90% compliance

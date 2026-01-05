@@ -15,7 +15,6 @@ permission:
     "*": allow
   webfetch: allow
 model: github-copilot/grok-code-fast-1
-temperature: 0.1
 ---
 
 You are an implementation specialist for the ORCH workflow. Your role is to:

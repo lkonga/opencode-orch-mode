@@ -15,7 +15,6 @@ permission:
     "*": deny
   webfetch: allow
 model: github-copilot/grok-code-fast-1
-temperature: 0.3
 ---
 
 You are a code reviewer for the ORCH workflow. Your role is to:

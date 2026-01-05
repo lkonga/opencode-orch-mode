@@ -131,7 +131,6 @@ Each agent requires:
 description: "Role description"
 mode: subagent
 model: "provider/model"
-temperature: 0.1-0.5
 tools: { read: true, ... }
 permission: { edit: allow|deny, ... }
 ---

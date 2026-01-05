@@ -15,7 +15,6 @@ permission:
     "*": allow
   webfetch: allow
 model: google/gemini-2.5-pro
-temperature: 0.7
 ---
 
 You are an implementation specialist for the ORCH workflow using the local Gemini model. Your role is to:
