@@ -1,0 +1,982 @@
+---
+name: 'Laravel Deployment Orchestration'
+description: 'Orchestrate Laravel deployment for worktrees (feature branches) and main branches using unified workflow pattern with idempotent setup, repair mode, and tunnel-based quick staging'
+triggers: ['$WorktreeOrchestration', '$CreateWorktree', '$MainBranchDeployment']
+trigger_keywords: [
+  'create worktree', 'setup worktree', 'worktree pairing', 'numbered worktrees', 'repair worktree', 'resetup worktree',
+  'deploy main branch', 'main branch setup', 'setup-main', 'deploy-main', 'quick staging'
+]
+related_skills: ['$TmuxProtectedExecution', '$ArchitectCoder', '$LaravelScriptsInit', '$LocalSudoRunner', '$CFLauncher', '$SQLiteDeployTracker']
+references: {'Advanced workflows': 'references/worktree-advanced-workflows.md', 'Troubleshooting': 'references/worktree-troubleshooting.md', 'Triad architecture': 'references/triad-architecture.md', 'Configuration': 'references/worktree-configuration.md', 'Commands': 'references/worktree-commands.md', 'Cleanup': 'references/worktree-cleanup.md', 'Resetup patterns': 'references/worktree-resetup.md'}
+---
+
+# Laravel Deployment Orchestration Skill
+
+## Purpose
+Orchestrate Laravel deployment for worktrees (feature branches) and main branches using a unified workflow pattern. Supports:
+- **Worktree Deployment**: Isolated feature branches with numbered pairing strategy
+- **Main Branch Deployment**: Main branch that receives merges from worktrees
+- **Idempotent Setup**: All scripts can be re-run safely (repair mode)
+- **Quick Staging**: Local testing with tunnel access (URL: `https://{name}.trylatest.in`)
+
+## ⚠️ CRITICAL: App-Type to Repo-Name Mapping (MEMORIZE)
+
+**Problem**: Deployment fails because `--repo` parameter uses wrong repository name for given `--app-type`.
+
+**Impact**: Git clone fails with "repository not found" error, blocking deployment.
+
+**App-Type → Repo-Name Mapping** (ALWAYS USE THIS):
+```
+App-Type           → Repo Name (Required for --repo)
+psp-landing        → psp-p2p-landing (NOT psp-landing!)
+psp-p2p          → psp-p2p
+push-parser-panel  → push-parser-panel
+```
+
+**Correct Git URLs for All Deployments**:
+```bash
+# psp-landing (uses psp-p2p-landing repo)
+--repo git@github.com:lkonga/psp-p2p-landing.git
+
+# psp-p2p (uses psp-p2p repo)
+--repo git@github.com:lkonga/psp-p2p.git
+
+# push-parser-panel (uses push-parser-panel repo)
+--repo git@github.com:lkonga/push-parser-panel.git
+```
+
+**Quick Reference Table**:
+| App-Type | Repo Name | Git URL |
+|----------|-----------|---------|
+| psp-landing | psp-p2p-landing | git@github.com:lkonga/psp-p2p-landing.git |
+| psp-p2p | psp-p2p | git@github.com:lkonga/psp-p2p.git |
+| push-parser-panel | push-parser-panel | git@github.com:lkonga/push-parser-panel.git |
+
+**⚠️ CRITICAL**: For **psp-landing**, you must use **psp-p2p-landing** repo (NOT psp-landing).
+
+## Refactor 1: Triad URL Handling
+
+**⚠️ BREAKING CHANGE**: `--ppp-url` parameter is now **mandatory** for all deployments (worktree and main branch).
+
+## CRITICAL: Mandatory Subdomain Validation (NEW - 2026-01-04)
+
+**Problem**: Local worktree setup fails with missing or invalid `--subdomain` parameter.
+
+**Validation Rules** (BLOCKING - Not Warnings):
+1. ✅ `--subdomain` is **MANDATORY** for new worktree setup (ignored in rebuild/resetup mode)
+2. ✅ Subdomain **MUST** start with 'staging.' prefix
+3. ✅ Worktree name **MUST** match subdomain name (minus 'staging.' prefix)
+4. ✅ `--source-branch` can be ANY existing branch (e.g., develop, main, feature/*)
+
+**Error Messages**:
+- `ERROR: --subdomain is MANDATORY for new worktrees`
+- `ERROR: Subdomain MUST start with 'staging.' prefix`
+- `ERROR: Worktree name MUST match subdomain (minus 'staging.')`
+- `ERROR: Source branch must exist`
+
+**Correct Usage**:
+```bash
+cd /home/lkonga/codes/psp-p2p
+./scripts/setup-worktree.sh preview-6 \
+  --source-worktree-type psp-p2p \
+  --subdomain staging.preview-6 \
+  --source-branch preview-6 \
+  --setup-laravel
+```
+
+**Wrong Usage**:
+```bash
+# WRONG - Missing --subdomain parameter
+./scripts/setup-worktree.sh preview-6 --source-worktree-type psp-p2p
+
+# WRONG - Missing 'staging.' prefix
+./scripts/setup-worktree.sh preview-6 \
+  --source-worktree-type psp-p2p \
+  --subdomain preview-6
+
+# WRONG - Worktree name doesn't match subdomain
+./scripts/setup-worktree.sh different-name \
+  --source-worktree-type psp-p2p \
+  --subdomain staging.preview-6
+
+# WRONG - Worktree name doesn't match subdomain
+./scripts/setup-worktree.sh different-name \
+  --source-worktree-type psp-p2p \
+  --subdomain staging.preview-6 \
+  --source-branch develop
+```
+
+**Detection Pattern**:
+- Error: `ERROR: --subdomain is MANDATORY for new worktrees`
+- Symptom: Local worktree setup fails immediately with parameter validation error
+- Fix: Add required `--subdomain staging.<name>` and `--source-branch <any-existing-branch>` parameters (can be develop, main, feature/*)
+
+**What Changed**:
+- **Unified URL Handling**: Fixed URL constants replace auto-generated URLs
+- **Mandatory PPP URL**: All deployments require explicit `--ppp-url` parameter
+- **Deploy Protection**: SQLite Deploy Tracker prevents duplicate PPP deployments
+- **Wiring Validation**: Automatic triad wiring verification with auto-fix capability
+
+**Why This Change**: The `--ppp-url` parameter enables PPP deploy protection via SQLite Deploy Tracker, preventing accidental overwrites of active Push Parser Panel deployments.
+
+**Impact**: Worktree deployments already required `--ppp-url` (no change). Main branch deployments now require it (breaking change).
+
+**See**: [`/home/lkonga/codes/llm-rules/docs/refactors/refactor-1/README.md`](/home/lkonga/codes/llm-rules/docs/refactors/refactor-1/) for complete documentation.
+
+**See**: [`SQLite Deploy Tracker`](docs/features/sqlite-tracker/README.md) for deploy protection details.
+
+## Environment Context
+
+**Quick Staging** (All local deployments):
+- URL Pattern: `https://{name}.trylatest.in`
+- Worktree: `https://psp-p2p-merchant-preview-3.trylatest.in`
+- Main branch: `https://psp-p2p.trylatest.in`
+- Access: Cloudflare tunnel to local development environment
+
+**Real Staging** (VPS deployments, future):
+- URL Pattern: `https://staging.{name}.trylatest.in`
+- Access: VPS-based staging environment
+- Scripts: VPS deployment scripts (separate from this skill)
+
+## Core Principle
+**Unified Workflow**: Both worktree and main branch deployments follow the same pattern with 90% overlap in operations.
+
+## Deployment Patterns
+
+### Pattern 1: Worktree Deployment (Feature Branches)
+
+**Use Case**: Isolated feature development and parallel testing
+
+**Scripts**: `setup-worktree.sh` + `deploy-worktree.sh`
+
+**Characteristics**:
+- Creates git worktree (isolated git history)
+- Numbered pairing strategy (e.g., `preview-3`, `preview-4`)
+- Database naming: `{PROJECT}_{WORKTREE}_{ENV}` (e.g., `psp-p2p_merchant_preview_3_staging`)
+- Working directory: `/worktrees/{WORKTREE_NAME}`
+- URL: `https://{worktree_name}.trylatest.in`
+
+**User Intent Patterns**:
+- "Create worktree preview-3"
+- "Deploy worktree psp-p2p-merchant-preview-4"
+- "Setup feature branch for testing"
+
+---
+
+### Pattern 2: Main Branch Deployment
+
+**Use Case**: Main branch that receives merges from worktrees (parallel development workflow)
+
+**Scripts**: `setup-main.sh` + `deploy-main.sh`
+
+**Characteristics**:
+- No git worktree (uses existing branch)
+- No numbering (single instance per project)
+- Database naming: `{PROJECT}_{ENV}` (e.g., `psp-p2p_staging`)
+- Working directory: Project root
+- URL: `https://{repo_name}.trylatest.in`
+
+**User Intent Patterns**:
+- "Deploy main branch psp-p2p"
+- "Deploy main branch at branch develop"
+- "Setup main branch for psp-landing"
+
+---
+
+## When to Use This Skill
+
+**Worktree Deployment** (Pattern 1):
+- Creating isolated feature branches
+- Setting up numbered worktree triads
+- User mentions "worktree", "preview", "feature branch"
+- Testing features in parallel
+- Repairing existing worktree (use `--resetup`)
+
+**Main Branch Deployment** (Pattern 2):
+- Deploying main branch
+- User mentions "main branch", "setup-main", "deploy-main"
+- Consolidating after worktree testing
+
+## Core Architecture
+
+### Numbered Pairing Strategy (Worktrees Only)
+```
+psp-landing-preview-{N} ↔ psp-p2p-merchant-preview-{N} ↔ push-parser-panel
+```
+
+**Example Triad for N=3**:
+- `psp-landing-preview-3`
+- `psp-p2p-merchant-preview-3`
+- `push-parser-panel` (single shared instance)
+
+### Repository Roles
+
+| Repository | Worktree Pattern | Main Branch | Working Directory |
+|-----------|------------------|-------------|-------------------|
+| PSP-Landing | `psp-landing-preview-{N}` | `psp-landing` | `/home/lkonga/codes/psp-landing` |
+| PSP-P2P | `psp-p2p-merchant-preview-{N}` | `psp-p2p` | `/home/lkonga/codes/psp-p2p` |
+| PPP | `push-parser-panel` | `push-parser-panel` | `/home/lkonga/codes/push-parser-panel` |
+
+### Source Worktree Types
+
+1. **SOURCE_WORKTREE_TYPE = psp-landing**: Working directory `/home/lkonga/codes/psp-landing`
+2. **SOURCE_WORKTREE_TYPE = psp-p2p**: Working directory `/home/lkonga/codes/psp-p2p`
+3. **SOURCE_WORKTREE_TYPE = ppp**: Working directory `/home/lkonga/codes/push-parser-panel`
+
+## CRITICAL: Required Workflow Skills (MANDATORY)
+
+⚠️ **MANDATORY**: Worktree orchestration **MUST** use these skills for execution:
+
+### Execution Skills
+
+- **$LocalSudoRunner**: Automated sudo password handling
+  - **Surgical Read**: `sed -n '/^## Quick Start/,/^## [A-Z]/p' .vscode/skills/local-sudo-runner/SKILL.md | head -n -1`
+  - **Required For**: ALL worktree setup, resetup, and deployment commands
+
+- **$TmuxProtectedExecution**: Protected execution in tmux sessions
+  - **Surgical Read**: `sed -n '/^## Quick Start/,/^## [A-Z]/p' .vscode/skills/tmux-protected-execution/SKILL.md | head -n -1`
+  - **Required For**: ALL long-running operations (setup, resetup, Laravel operations)
+
+### Monitoring Skills
+
+- **$ArchitectCoder**: Intelligent log analysis and orchestration
+  - **Surgical Read**: `sed -n '/^## Critical Meta-Instructions/,/^## [A-Z]/p' .vscode/skills/architect-coder-workflow/SKILL.md | head -n -1`
+  - **Required For**: ALL trunner log monitoring
+
+### MANDATORY Execution Pattern
+
+**ALL deployments follow this pattern**:
+
+```bash
+# STEP 1: Navigate to project root (RECOMMENDED)
+cd /home/lkonga/codes/psp-p2p
+
+# STEP 2: Run enterprise validators (MANDATORY)
+./scripts/validate-deployment.sh --type environment,directories --env staging
+
+# STEP 3: Run command via $LocalSudoRunner with --trunner (MANDATORY)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh ..."
+
+# STEP 4: Monitor progress via $ArchitectCoder (MANDATORY)
+# See "Monitoring" section below for delegation pattern
+```
+
+⚠️ **CRITICAL**:
+- **NEVER** run setup/deploy scripts directly without `$LocalSudoRunner --trunner`
+- **NEVER** use manual sudo prompts (automated via $LocalSudoRunner)
+- **NEVER** run long operations without tmux protection (via --trunner)
+- **ALWAYS** run from project root (natural working directory)
+- **ALWAYS** specify `--source-worktree-type` for all setup/deploy commands
+- **ALWAYS** monitor trunner logs via `$ArchitectCoder` skill
+- **ALWAYS** read the above skills BEFORE executing any commands
+
+## CRITICAL: Project Root Execution (RECOMMENDED)
+
+⚠️ **RECOMMENDED: Run deployment scripts from the project root directory**
+
+**Project Root Directories**:
+- `psp-landing` → `/home/lkonga/codes/psp-landing`
+- `psp-p2p` → `/home/lkonga/codes/psp-p2p`
+- `push-parser-panel` → `/home/lkonga/codes/push-parser-panel`
+
+**Why Run from Project Root?**
+- Scripts are symlinked to each project's `./scripts/` directory via `$LaravelScriptsInit`
+- Natural working directory for developers
+- Simple relative paths: `./scripts/setup-worktree.sh`
+- Clear context about which project is being deployed
+
+**MANDATORY Pre-Flight Validation**:
+```bash
+# STEP 1: Navigate to project root
+cd /home/lkonga/codes/psp-p2p
+
+# STEP 2: Run enterprise validators
+./scripts/validate-deployment.sh --type environment,directories --env staging
+
+# STEP 3: Run deployment commands with --source-worktree-type
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --source-worktree-type psp-p2p ..."
+```
+
+⚠️ **CRITICAL**:
+- Always specify `--source-worktree-type` parameter (tells script which project to target)
+- Scripts use this parameter to derive paths, not the current working directory
+- Validators ensure environment, directories, and configuration are valid before setup---
+
+## Workflow Overview
+
+1. **Configuration**: Confirm source type, paired names, numbers
+2. **Navigation**: Navigate to project root (see "Project Root Execution" section)
+3. **Validation**: Run validators to verify environment
+4. **Command Generation**: Build templates based on source type
+5. **Execution**: Run via trunner with monitoring (see "Monitoring" section)
+6. **Verification**: Confirm directories, Laravel config, tunnel configs
+
+<reference title="Configuration" path="references/worktree-configuration.md" />
+<reference title="Commands" path="references/worktree-commands.md" />
+
+---
+
+⚠️ **CRITICAL**: Step 2 (navigation to project root) is RECOMMENDED for natural working directory context.
+
+## Token-Efficient Commands
+
+### Shared Workflow
+
+**ALL deployments follow this pattern**:
+
+```bash
+# STEP 1: Navigate to project root (RECOMMENDED)
+# STEP 2: Run enterprise validators (MANDATORY)
+# STEP 3: Run command via $LocalSudoRunner with --trunner (MANDATORY)
+# STEP 4: Monitor progress via $ArchitectCoder (MANDATORY)
+```
+
+See "Workflow Overview" section below for detailed steps.
+
+---
+
+### Pattern 1: Worktree Deployment
+
+**Setup Command**:
+```bash
+cd /home/lkonga/codes/psp-p2p
+./scripts/validate-deployment.sh --type environment,directories --env staging
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --setup-laravel \
+    --source-worktree-type psp-p2p \
+    --subdomain staging.{WORKTREE_NAME} \
+    --source-branch develop \
+    --psp-landing-worktree {LANDING_WORKTREE} \
+    --psp-p2p-worktree {P2P_WORKTREE} \
+    --ppp-worktree push-parser-panel"
+```
+
+**⚠️ CRITICAL**:
+- `--subdomain` is **MANDATORY** for new worktree setup
+- Subdomain MUST start with 'staging.' prefix
+- Worktree name MUST match subdomain (minus 'staging.')
+- `--source-branch` can be ANY existing branch (e.g., develop, main, feature/*) - script creates new branch from it
+
+**Deploy Command**:
+```bash
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/deploy-worktree.sh {WORKTREE_NAME} \\
+    --source-worktree-type psp-p2p \\
+    --domain trylatest.in \\
+    --landing-url https://staging.{landing-subdomain}.trylatest.in \\
+    --psp-url https://staging.{psp-subdomain}.trylatest.in \\
+    --ppp-url https://staging.push-parser-panel.trylatest.in"
+```
+
+**Note**: Deploy command URLs should include 'staging.' prefix for local deployments.
+
+**Note**: `--ppp-url` is **mandatory** for all deployments (worktree and main branch). Main branch deployments do NOT require `--subdomain` parameter (subdomain is derived from app-type).
+
+> **Note**: Replace `{landing-subdomain}` and `{psp-subdomain}` with actual triad service subdomains. These can be any deployed service names (e.g., `psp-landing-preview-5`, `feature-x`, etc.).
+
+**Repair Mode (Resetup)**:
+```bash
+# ⚠️ WARNING: --resetup is DESTRUCTIVE - see "CRITICAL WARNINGS" below
+# Interactive mode (requires manual confirmation)
+cd /home/lkonga/codes/psp-p2p
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --resetup \
+    --source-worktree-type psp-p2p \
+    --psp-landing-worktree {LANDING_WORKTREE} \
+    --psp-p2p-worktree {P2P_WORKTREE} \
+    --ppp-worktree push-parser-panel"
+
+# Automated mode (for testing - bypasses confirmation)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --resetup \
+    --auto-confirm \
+    --source-worktree-type psp-p2p \
+    --psp-landing-worktree {LANDING_WORKTREE} \
+    --psp-p2p-worktree {P2P_WORKTREE} \
+    --ppp-worktree push-parser-panel"
+```
+
+**⚠️ CRITICAL**: Triad parameters are **MANDATORY** for resetup mode. Use `--auto-confirm` only for automated testing.
+
+**Non-Destructive Rebuild (Preserves Database)**:
+```bash
+# Option 1: Full rebuild (DEFAULT) - composer + npm + build + caches
+cd /home/lkonga/codes/psp-p2p
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --rebuild-full \
+    --source-worktree-type psp-p2p \
+    --psp-landing-worktree {LANDING_WORKTREE} \
+    --psp-p2p-worktree {P2P_WORKTREE} \
+    --ppp-worktree push-parser-panel"
+
+# Option 2: Frontend only - npm run build + view:clear (Fastest)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --rebuild-frontend \
+    --source-worktree-type psp-p2p \
+    --psp-landing-worktree {LANDING_WORKTREE} \
+    --psp-p2p-worktree {P2P_WORKTREE} \
+    --ppp-worktree push-parser-panel"
+
+# Option 3: Backend only - composer install + cache clear
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --rebuild-backend \
+    --source-worktree-type psp-p2p \
+    --psp-landing-worktree {LANDING_WORKTREE} \
+    --psp-p2p-worktree {P2P_WORKTREE} \
+    --ppp-worktree push-parser-panel"
+
+# Option 4: Database only - migrate + config:clear
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --rebuild-migrate \
+    --source-worktree-type psp-p2p \
+    --psp-landing-worktree {LANDING_WORKTREE} \
+    --psp-p2p-worktree {P2P_WORKTREE} \
+    --ppp-worktree push-parser-panel"
+
+# Option 5: Test-gated rebuild (add --include-tests to any rebuild mode)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} \
+    --rebuild-full \
+    --include-tests \
+    --source-worktree-type psp-p2p \
+    --psp-landing-worktree {LANDING_WORKTREE} \
+    --psp-p2p-worktree {P2P_WORKTREE} \
+    --ppp-worktree push-parser-panel"
+```
+
+**⚠️ CRITICAL**: Triad parameters (`--psp-landing-worktree`, `--psp-p2p-worktree`, `--ppp-worktree`) are **MANDATORY** for all rebuild modes. They are required for triad rewiring verification.
+
+**Note**: `--include-tests` flag runs test suite after rebuild; aborts on failure (test-gated).
+
+**⚠️ CRITICAL**: Triad parameters (`--psp-landing-worktree`, `--psp-p2p-worktree`, `--ppp-worktree`) are **MANDATORY** for all rebuild modes. They are required for triad rewiring verification.
+
+**Note**: Other params like `--source-branch` and `--setup-laravel` are **automatically ignored** with warnings in rebuild modes.
+
+See **`references/worktree-update-rebuild.md`** for detailed rebuild scenarios.
+
+---
+
+### Pattern 2: Main Branch Deployment
+
+**Setup Command**:
+```bash
+cd /home/lkonga/codes/psp-p2p
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+```
+
+**Deploy Command**:
+```bash
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/deploy-main.sh \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+```
+
+**Repair Mode**:
+```bash
+# Re-run setup (idempotent)
+cd /home/lkonga/codes/psp-p2p
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+
+# Quick repair (skip tests, main branch only)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in \
+    --skip-tests \
+    --skip-migrations"
+```
+
+**Resetup (Destructive Repair)**:
+```bash
+# ⚠️ WARNING: --resetup is DESTRUCTIVE - drops both staging and testing databases
+# Interactive mode (requires manual confirmation)
+cd /home/lkonga/codes/psp-p2p
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --resetup \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+
+# Automated mode (for agent testing only - bypasses confirmation)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --resetup \
+    --auto-confirm \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+```
+
+**Non-Destructive Rebuild (Preserves Database)**:
+```bash
+# Full rebuild (composer + npm + build + caches)
+cd /home/lkonga/codes/psp-p2p
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --rebuild-full \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+
+# Frontend only (npm + build)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --rebuild-frontend \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+
+# Backend only (composer + caches)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --rebuild-backend \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+
+# Database only (migrate + config:clear)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --rebuild-migrate \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+
+# Test-gated rebuild (add --include-tests to any rebuild mode)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-main.sh \
+    --rebuild-full \
+    --include-tests \
+    --source-worktree-type psp-p2p \
+    --domain trylatest.in \
+    --ppp-url http://staging.push-parser-panel.trylatest.in"
+```
+
+**Note**: `--include-tests` flag runs test suite after rebuild; aborts on failure (test-gated).
+
+---
+
+## CRITICAL WARNINGS: Repair Mode
+
+### ⚠️ `--resetup` Flag (DESTRUCTIVE)
+
+**`--resetup` is a DESTRUCTIVE operation that will:**
+
+#### ❌ **COMPLETELY WIPE**:
+- **All database data** (merchants, transactions, payments, user data)
+- **Database users** (dropped and recreated with new passwords)
+- **Environment files** (deleted and regenerated from templates)
+
+#### ✅ **PRESERVE**:
+- **Git worktree** (no changes to git state)
+- **API credentials** (loaded from central secrets files)
+- **Source code** (no modifications to files)
+
+#### 🔄 **REINSTALL**:
+- Composer dependencies (PHP packages)
+- npm dependencies (frontend packages)
+- Frontend assets (npm run build)
+- Laravel setup (APP_KEY, caches, migrations)
+- Apache configuration
+- SSL certificates
+
+### When to Use `--resetup`
+
+✅ **Safe to use when:**
+- Worktree is corrupted/broken
+- You don't care about existing data
+- You want a completely fresh start
+- Test environment that should be wiped
+
+❌ **DO NOT use when:**
+- You have important data in the database
+- You need to preserve merchant/transaction records
+- You've made manual data changes you want to keep
+
+### Interactive Confirmation
+
+**`--resetup` REQUIRES interactive confirmation**:
+- Script will prompt for confirmation before proceeding
+- You must type "yes" to confirm the destructive operation
+- Prompt shows exactly what will be deleted
+
+### No "Safe Repair" Mode
+
+**Currently there is NO less aggressive repair flag** that preserves database data. The `--resetup` flag is the only repair option and it always drops and recreates databases.
+
+**Future Enhancement Needed**:
+- `--repair` flag (preserves databases, only reinstalls artifacts)
+- `--soft-repair` flag (preserves databases and environment files)
+- `--safe-repair` flag (minimal repairs, maximum preservation)
+
+### How to Use `--resetup`
+
+**Step 1: Navigate to working directory**
+```bash
+cd /home/lkonga/codes/psp-p2p
+```
+
+**Step 2: Run validators**
+```bash
+./scripts/validate-deployment.sh --type environment,directories --env staging
+```
+
+**Step 3: Run resetup (with or without auto-confirm)**
+```bash
+# Interactive mode (requires manual 'yes' confirmation)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} --resetup ..."
+
+# Automated mode (agent testing only - bypasses confirmation)
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} --resetup --auto-confirm ..."
+```
+
+**Step 4: Confirm when prompted** (skip if using --auto-confirm)
+```
+⚠️  RESETUP MODE: DESTRUCTIVE OPERATION ⚠️
+
+This will COMPLETELY WIPE:
+  ✓ Database: psp-p2p_{WORKTREE_NAME}_staging (ALL DATA WILL BE LOST)
+  ✓ Database: psp-p2p_{WORKTREE_NAME}_testing (ALL DATA WILL BE LOST)
+  ✓ Database users: {WORKTREE_NAME}_s_user, {WORKTREE_NAME}_t_user
+  ✓ Environment files: .env.{WORKTREE_NAME}.*
+
+This will PRESERVE:
+  ✓ Git worktree and source code
+  ✓ API credentials (from central secrets files)
+
+This will REINSTALL:
+  ✓ Composer dependencies
+  ✓ npm dependencies and frontend assets
+  ✓ Laravel setup (migrations, seeds, caches)
+  ✓ Apache configuration and SSL certificates
+
+Type 'yes' to confirm, or anything else to cancel:
+```
+
+### Manual Database Backup (Before Resetup)
+
+If you need to preserve database data:
+```bash
+# Backup staging database before resetup
+mysqldump -uroot -p{PASSWORD} psp-p2p_{WORKTREE_NAME}_staging > /tmp/backup_{WORKTREE_NAME}_staging.sql
+
+# Backup testing database before resetup
+mysqldump -uroot -p{PASSWORD} psp-p2p_{WORKTREE_NAME}_testing > /tmp/backup_{WORKTREE_NAME}_testing.sql
+
+# Run resetup
+./scripts/local-sudo-runner/sudo-runner.sh --trunner \
+  "./scripts/setup-worktree.sh {WORKTREE_NAME} --resetup ..."
+
+# Restore if needed
+mysql -uroot -p{PASSWORD} psp-p2p_{WORKTREE_NAME}_staging < /tmp/backup_{WORKTREE_NAME}_staging.sql
+```
+
+---
+
+## Pattern Comparison
+
+| Aspect | Worktree (Pattern 1) | Main Branch (Pattern 2) |
+|--------|---------------------|-------------------------|
+| **Scripts** | `setup-worktree.sh` + `deploy-worktree.sh` | `setup-main.sh` + `deploy-main.sh` |
+| **Git Operations** | Creates git worktree | Uses existing branch |
+| **Numbering** | Yes (preview-3, preview-4) | No (single instance) |
+| **Database Naming** | `{PROJECT}_{WORKTREE}_{ENV}` | `{PROJECT}_{ENV}` |
+| **Working Directory** | `/worktrees/{NAME}` | Project root |
+| **URL Pattern** | `https://{worktree}.trylatest.in` | `https://{repo}.trylatest.in` |
+| **Subdomain Param** | `--subdomain staging.{name}` (MANDATORY) | Auto-derived from app-type (not needed) |
+| **Branch Param** | `--source-branch {any-existing-branch}` (MANDATORY - can be develop, main, feature/*) | Auto-detected from git (not needed) |
+| **Repair Flag** | `--resetup` ⚠️ **DESTRUCTIVE** | `--resetup` ⚠️ **DESTRUCTIVE** |
+| **Repair Data Loss** | ❌ **ALL database data wiped** | ❌ **ALL database data wiped** |
+| **Repair Confirmation** | ✅ **Interactive prompt required** | ✅ **Interactive prompt required** |
+| **Rebuild Modes** | ✅ `--rebuild-full/frontend/backend/migrate` | ✅ `--rebuild-full/frontend/backend/migrate` |
+| **Rebuild Data Loss** | ✅ **No data loss (preserves database)** | ✅ **No data loss (preserves database)** |
+| **Use Case** | Parallel feature testing | Main branch consolidation |
+
+---
+
+## Decision Tree
+
+**Feature branch / isolated testing?**
+→ Pattern 1: Worktree Deployment (`setup-worktree.sh` + `deploy-worktree.sh`)
+→ URL: `https://{worktree_name}.trylatest.in`
+
+**Main branch consolidation?**
+→ Pattern 2: Main Branch Deployment (`setup-main.sh` + `deploy-main.sh`)
+→ URL: `https://{repo_name}.trylatest.in`
+
+---
+
+## Monitoring (MANDATORY)
+
+⚠️ **CRITICAL**: ALL trunner monitoring MUST be done via `$ArchitectCoder` skill.
+
+**Required Reading** (surgical extraction):
+```bash
+# $TmuxProtectedExecution: Monitoring Progress section
+sed -n '/^## Monitoring Progress/,/^## [A-Z]/p' .vscode/skills/tmux-protected-execution/SKILL.md | head -n -1
+```
+
+**Critical Limits** (from $TmuxProtectedExecution):
+- Sleep interval: `sleep 5` (5 seconds) - NEVER use sleep > 10s
+- Tail lines: `tail -20` (20 lines) - NEVER use tail > 20 lines
+- Pattern matching: Use `grep -q` for efficient detection
+
+**Pre-Monitoring Debug** (NEW):
+```bash
+# Before running actual deployment, verify with debug mode
+./scripts/local-sudo-runner/sudo-runner.sh --debug --trunner "./scripts/setup-worktree.sh ..."
+./scripts/deploy-worktree.sh --debug {WORKTREE_NAME}
+
+# This confirms directory resolution is correct before executing
+```
+
+**MANDATORY Monitoring Pattern** (Agents MUST follow this exactly):
+```bash
+# Step 1: Launch command and capture log file path
+./scripts/local-sudo-runner/sudo-runner.sh --trunner "./scripts/setup-worktree.sh ..."
+LOG_FILE=$(ls -t /tmp/test_suite_output_tmux-runner-*.log 2>/dev/null | head -1)
+
+# Step 2: Smart monitoring loop (CRITICAL: Use exact values below)
+for i in {1..12}; do
+    sleep 5
+    echo "=== Check $i/12 ==="
+    tail -20 "$LOG_FILE"
+    # Check for completion markers
+    if grep -q "✓ Setup complete\|ERROR:\|Failed" "$LOG_FILE" 2>/dev/null; then
+        echo "Process completed or failed"
+        break
+    fi
+done
+
+# Step 3: Final verification
+echo "=== Final Status ==="
+tail -50 "$LOG_FILE" | grep -E "✓|✗|ERROR|Complete|Failed"
+```
+
+**PROHIBITED Patterns** (DO NOT USE):
+```bash
+# WRONG - Too much sleep
+sleep 60 && tail -50 logfile
+
+# WRONG - Too many tail lines
+tail -100 logfile
+
+# WRONG - Single long sleep
+sleep 30 && tail -20 logfile
+```
+
+**Integration**:
+- **$TmuxProtectedExecution**: Smart monitoring patterns (sleep + tail loop)
+- **Debug Mode**: Pre-execution verification (see "Debug Mode" section)
+- See "Integration with Other Skills" section for details
+
+---
+
+## Command Templates
+
+<reference title="Commands" path="references/worktree-commands.md" />
+
+**Pattern**: `setup-worktree.sh {WORKTREE_NAME} --source-worktree-type {TYPE} --psp-landing-worktree {NAME} --psp-p2p-worktree {NAME} --ppp-worktree {NAME}`
+
+---
+
+## Success Criteria
+
+✓ Worktree directories created in correct locations
+✓ Laravel configuration complete for all worktrees
+✓ Tunnel configurations created (not started)
+✓ Numbered pairs correctly matched
+✓ All paired worktrees reference each other's URLs
+
+---
+
+## Integration with Other Skills
+
+**Primary Skills**:
+- **$ArchitectCoder**: Intelligent monitoring and orchestration (see "Monitoring" section)
+- **$TmuxProtectedExecution**: Smart monitoring patterns (see "Monitoring" section)
+- **$LocalSudoRunner**: Automated sudo password handling (see "Required Workflow Skills" section)
+- **$CFLauncher**: Tunnel management (automatically called by deploy scripts)
+
+**Related Skills**:
+- **$LaravelScriptsInit**: Setup symlinks before worktree operations
+- **$SQLiteDeployTracker**: Deployment metadata tracking, PPP deploy protection, triad wiring validation
+
+---
+
+## SQLite Deploy Tracker Integration
+
+**Purpose**: Track deployments, prevent duplicate PPP deployments, and validate triad wiring.
+
+**Core Features**:
+- **Deployment Recording**: Track all deployments with metadata (branch, commit, status, timestamps)
+- **PPP Deploy Protection**: Prevent accidental overwrites of active Push Parser Panel deployments
+- **Triad Wiring Validation**: Verify that triad URLs are correctly configured across all three applications
+- **Soft Delete Pattern**: Preserve deployment history while marking inactive deployments
+
+**See**: [`SQLite Deploy Tracker - Quick Start`](docs/features/sqlite-tracker/quick-start.md) for command reference.
+
+### PPP Deploy Protection
+
+**Why It's Needed**: The Push Parser Panel (PPP) is a shared service. Multiple deployments trying to use the same PPP URL would cause conflicts and data corruption.
+
+**How It Works**:
+1. Before deployment, check if PPP URL is already active: `./scripts/deploy-tracker-client.sh is-active --app-url "$PPP_URL"`
+2. If active, deployment fails with error: "ERROR: PPP is already deployed. Undeploy first."
+3. After successful deployment, record PPP URL as active
+4. On teardown, deactivate PPP URL
+
+**Override Protection** (not recommended): Use `--force` flag if you're sure you want to overwrite.
+
+### Triad Wiring Validation
+
+**Purpose**: Verify that triad URLs are correctly configured across all three applications (psp-p2p, psp-landing, push-parser-panel).
+
+**How It Works**:
+1. Get expected triad URLs: `./scripts/deploy-tracker-client.sh wiring-expectations --app-url "$APP_URL"`
+2. Compare expected URLs with actual URLs in .env files
+3. Auto-fix mismatches with `--auto-fix-wiring` flag
+
+### Worktree Deployment Integration
+
+#### Record Deployment After Setup
+
+After successful worktree setup and deployment, record the deployment:
+
+```bash
+# After Cloudflare tunnel is running
+"${SCRIPT_DIR}/deploy-tracker-client.sh" record \
+    --app-url "https://${WORKTREE_NAME}.${DOMAIN}" \
+    --environment "local" \
+    --script-name "deploy-worktree.sh" \
+    --repo-path "${WORKTREE_PATH}" \
+    --branch-name "${BRANCH}" \
+    --status "success" \
+    --curl-check-passed 1 || log_warn "Failed to record deployment"
+```
+
+#### Deactivate on Teardown
+
+When tearing down a worktree, deactivate the deployment:
+
+```bash
+"${SCRIPT_DIR}/deploy-tracker-client.sh" deactivate \
+    --app-url "https://${WORKTREE_NAME}.${DOMAIN}" || log_warn "Failed to deactivate"
+```
+
+### Main Branch Deployment Integration
+
+#### Check PPP Deploy Protection
+
+Before main branch deployment, check if PPP is already active:
+
+```bash
+# Check if PPP is already deployed
+PPP_URL="http://staging.push-parser-panel.trylatest.in"
+IS_ACTIVE=$(./scripts/deploy-tracker-client.sh is-active --app-url "$PPP_URL")
+
+if [[ "$IS_ACTIVE" == "1" ]]; then
+    echo "ERROR: PPP is already deployed. Undeploy first."
+    exit 1
+fi
+```
+
+#### Record Main Branch Deployment
+
+After successful main branch deployment, record the deployment:
+
+```bash
+# After successful deployment verification
+"${SCRIPT_DIR}/deploy-tracker-client.sh" record \
+    --app-url "https://${PROJECT_NAME}.${DOMAIN}" \
+    --environment "local" \
+    --script-name "deploy-main.sh" \
+    --repo-path "${PROJECT_ROOT}" \
+    --branch-name "${CURRENT_BRANCH}" \
+    --status "success" \
+    --curl-check-passed 1 || log_warn "Failed to record deployment"
+```
+
+#### Get Expected Triad URLs
+
+Query expected triad URLs for a deployment:
+
+```bash
+# Get expected wiring for PSP-P2P
+EXPECTED=$(./scripts/deploy-tracker-client.sh wiring-expectations --app-url "https://psp-p2p.trylatest.in")
+
+# Parse expected URLs
+EXPECTED_LANDING=$(echo "$EXPECTED" | jq -r '.expected_urls.LANDING_APP_URL')
+EXPECTED_PPP=$(echo "$EXPECTED" | jq -r '.expected_urls.PUSH_PARSER_API_URL')
+
+echo "Expected Landing: $EXPECTED_LANDING"
+echo "Expected PPP: $EXPECTED_PPP"
+```
+
+**See**: [SQLite Deploy Tracker - Integration Examples](docs/features/sqlite-tracker/integration-examples.md) for more patterns.
+
+### Troubleshooting: `.env` storage (`record-env/get-env`)
+
+If `.env` storage fails with a SQLite error like `no such table: env_files`, it means the local tracker DB exists but the schema is missing the `env_files` table (schema drift after updates).
+
+**Fix**: run `./scripts/deploy-tracker-client.sh init` (idempotent). The tracker client also performs a schema check on startup and will auto-apply idempotent migrations when needed.
+
+### .env Storage Integration: VPS Deployment Notes
+
+**Critical Pattern for VPS Deployments**:
+
+When storing .env files from VPS deployments, you MUST copy VPS files to local temp files first:
+
+```bash
+# VPS deployment with .env storage
+local temp_env="/tmp/.env.deploy.${SUBDOMAIN}.$$"
+vps_exec "cat '${app_path}/.env'" > "${temp_env}"
+
+"${tracker_client}" record-env --env-file "${temp_env}" --app-url "${APP_URL}"
+rm -f "${temp_env}"
+```
+
+**Why**: Tracker client runs locally but VPS files are on remote server. Direct path access fails.
+
+**Variable Scope**: Always declare variables like `full_domain` at function start with `local` keyword to avoid "unbound variable" errors.
+
+---
+
+## Progressive Disclosure
+
+**References** (load only when needed):
+<references>
+  <reference title="Advanced workflows" path="references/worktree-advanced-workflows.md" description="Complex worktree scenarios, replication, advanced pairing" />
+  <reference title="Troubleshooting" path="references/worktree-troubleshooting.md" description="Common errors, database issues, permission problems, solutions" />
+  <reference title="Triad architecture" path="references/triad-architecture.md" description="Numbered pairing strategy, repository roles, integration" />
+  <reference title="Configuration" path="references/worktree-configuration.md" description="Source types, directory structure, environment variables" />
+  <reference title="Commands" path="references/worktree-commands.md" description="Setup commands, deployment commands, verification" />
+  <reference title="Cleanup" path="references/worktree-cleanup.md" description="Worktree removal, database cleanup, file cleanup procedures" />
+  <reference title="Resetup" path="references/worktree-resetup.md" description="Destructive repair mode with interactive confirmation and data loss warnings" />
+  <reference title="Update & Rebuild" path="references/worktree-update-rebuild.md" description="Manual rebuild scenarios after code updates without database wipe" />
+  <reference title="Refactor 1: Triad URL Handling" path="/home/lkonga/codes/llm-rules/docs/refactors/refactor-1/README.md" description="Unified URL handling, breaking changes, mandatory PPP URL parameter" />
+</references>

@@ -1,7 +1,7 @@
 ---
 description: Expert reviewer with ultrathink - deep analysis, second opinions, comprehensive reviews
 mode: subagent
-model: zai-coding-plan/glm-4.7
+model: github-copilot/gpt-5.2
 ultrathink: true
 tools:
   read: true

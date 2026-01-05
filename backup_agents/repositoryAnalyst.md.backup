@@ -1,7 +1,7 @@
 ---
 description: Deep codebase analyst with ultrathink - comprehensive analysis, architectural reviews, long-form reasoning
 mode: subagent
-model: zai-coding-plan/glm-4.7
+model: github-copilot/gpt-5.2
 ultrathink: true
 tools:
   read: true

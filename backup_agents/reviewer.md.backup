@@ -1,7 +1,7 @@
 ---
 description: Quick code reviewer - fast, focused reviews with clear pass/fail assessment
 mode: subagent
-model: zai-coding-plan/glm-4.7
+model: github-copilot/gpt-5.2
 tools:
   read: true
   list: true

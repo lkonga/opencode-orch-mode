@@ -1,0 +1,89 @@
+ORCH AGENTS AND COMMAND BACKUP MANIFEST
+========================================
+Date: 2025-01-05
+Operation: MOVE (not delete)
+Status: COMPLETED
+
+FILES MOVED TO BACKUP
+====================
+
+Agents (4 files moved):
+-----------------------
+1. implementor-zai-glm-4-5.md
+   Source: .opencode_global/agent/implementor-zai-glm-4-5.md
+   Backup: backup_orch_agents/agents/implementor-zai-glm-4-5.md
+   Size: 1586 bytes
+   Purpose: ORCH workflow implementor agent
+
+2. reviewer-github-copilot-grok-fast.md
+   Source: .opencode_global/agent/reviewer-github-copilot-grok-fast.md
+   Backup: backup_orch_agents/agents/reviewer-github-copilot-grok-fast.md
+   Size: 2027 bytes
+   Purpose: ORCH workflow reviewer agent
+
+3. gemini-implementor.md
+   Source: .opencode_global/agent/gemini-implementor.md
+   Backup: backup_orch_agents/agents/gemini-implementor.md
+   Size: 1544 bytes
+   Purpose: Alternative ORCH implementor agent
+
+4. grok.md
+   Source: .opencode_global/agent/grok.md
+   Backup: backup_orch_agents/agents/grok.md
+   Size: 900 bytes
+   Purpose: Implementation specialist agent
+
+Commands (1 file moved):
+------------------------
+1. orch.md
+   Source: .opencode_global/command/orch.md
+   Backup: backup_orch_agents/commands/orch.md
+   Size: 4993 bytes
+   Purpose: ORCH workflow slash command
+
+REMAINING IN SOURCE DIRECTORIES
+================================
+
+.opencode_global/agent/ (12 files remaining):
+- build.md
+- coder.md
+- expert.md
+- explore.md
+- general.md
+- plan.md
+- PromptEnhancer.md
+- quickReviewer.md
+- README.md
+- repositoryAnalyst.md
+- reviewer.md
+- summarizer.md
+
+.opencode_global/command/ (2 files remaining):
+- multi.md
+- orch.md.backup
+
+VERIFICATION STATUS
+===================
+✓ All 4 agent files moved successfully
+✓ All 1 command file moved successfully
+✓ Source files removed from original locations
+✓ Backup directory structure created
+✓ No files deleted - all moved safely
+
+UPDATE: 2025-01-05 20:54
+========================
+
+Additional Agent Moved (5th agent):
+-----------------------------------
+5. glm.md
+   Source: .opencode_global/agent/glm.md
+   Backup: backup_orch_agents/agents/glm.md
+   Size: ~200 bytes
+   Purpose: General coding and planning agent
+   Reason: Not registered in opencode.json, unused in current workflow
+
+Updated Status:
+- .opencode_global/agent/ now has 12 files (glm.md removed)
+- All backed up agents preserved for reference
+- No active functionality broken
+

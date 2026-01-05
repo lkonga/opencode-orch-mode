@@ -1,7 +1,7 @@
 ---
 description: Implementation specialist for executing development plans and code modifications. Delegates to @explore for context discovery.
 mode: subagent
-model: zai-coding-plan/glm-4.7
+model: github-copilot/gpt-5.2
 permission:
   edit: allow
   bash:
