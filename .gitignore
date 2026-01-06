@@ -1,2 +1,6 @@
 # OpenCode backup files
 .opencode_global/opencode.json.backup*
+.vscode/skills
+AGENTS.md
+.opencode/skill
+CLAUDE.md
