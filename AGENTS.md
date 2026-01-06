@@ -1,1 +1,1 @@
-/home/lkonga/codes/llm-rules/AGENTS.md
+/home/lkonga/codes/llm-rules/AGENTS.source.md

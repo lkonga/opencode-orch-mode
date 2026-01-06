@@ -1,1 +1,0 @@
-/home/lkonga/codes/opencode-related/opencode-orch-mode/.opencode_global/agent/expert.md

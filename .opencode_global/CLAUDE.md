@@ -1,1 +1,0 @@
-/home/lkonga/codes/llm-rules/skills-opencode/CLAUDE.md
