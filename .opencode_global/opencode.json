@@ -124,6 +124,71 @@
     }
   },
   "provider": {
+    "zai": {
+      "name": "Z.AI",
+      "npm": "@ai-sdk/anthropic",
+      "options": {
+        "baseURL": "https://api.z.ai/api/anthropic/v1",
+        "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
+      },
+      "models": {
+        "glm-4.7": {
+          "id": "glm-4.7",
+          "name": "GLM-4.7",
+          "attachment": false,
+          "temperature": true,
+          "tool_call": true,
+          "release_date": "2025-12-01",
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          },
+          "options": {}
+        },
+        "glm-4.7-thinking": {
+          "id": "glm-4.7",
+          "name": "GLM-4.7 Thinking",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
+        },
+        "glm-4.7-fast": {
+          "id": "glm-4.7",
+          "name": "GLM-4.7 Fast",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 128000
+          }
+        }
+      }
+    },
     "chutes": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Chutes.ai",
@@ -134,30 +199,7 @@
       "models": {
         "zai-org/GLM-4.5-turbo": {},
         "moonshotai/Kimi-K2-Instruct-0905": {},
-        "Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8": {},
-        "MiniMaxAI/MiniMax-M2.1-TEE": {
-          "options": {
-            "temperature": 1.0,
-            "topP": 0.95,
-            "topK": 40
-          }
-        }
-      }
-    },
-    "zai-coding-plan": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Z.AI Coding Plan",
-      "options": {
-        "baseURL": "https://api.z.ai/api/coding/paas/v4",
-        "apiKey": "b2442a512a7940c2bb29caba28f49c8a.KoJlYSGjsvNxUPt6"
-      },
-      "models": {
-        "glm-4.7": {
-          "options": {
-            "topP": 0.95,
-            "temperature": 0.7
-          }
-        }
+        "Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8": {}
       }
     },
     "opencode": {
@@ -199,11 +241,6 @@
       "models": {
         "gpt-4.1": {},
         "gpt-5-mini": {},
-        "gpt-5.2": {
-          "options": {
-            "temperature": 0
-          }
-        },
         "grok-code-fast-1": {}
       }
     },
@@ -230,57 +267,24 @@
   },
   "agent": {
     "general": {
-      "model": "zai-coding-plan/glm-4.7",
-      "description": "General-purpose agent"
+      "model": "zai/glm-4.7",
+      "description": "General-purpose agent for researching and multi-step tasks"
     },
     "build": {
-      "model": "zai-coding-plan/glm-4.7",
-      "description": "Build agent for development tasks"
+      "model": "zai/glm-4.7",
+      "description": "Build agent with reasoning enabled for complex development tasks"
     },
     "expert": {
       "description": "Expert subagent for complex tasks requiring deep reasoning and analysis. Use for architectural decisions, complex refactoring, debugging difficult issues, and tasks requiring thorough analysis.",
       "mode": "subagent",
-      "model": "github-copilot/gpt-5.2"
+      "model": "zai/glm-4.7-thinking",
+      "systemPrompt": "You are an expert coding assistant with deep analytical capabilities. Take time to think carefully through complex problems. Consider multiple approaches, analyze trade-offs, and provide detailed reasoning before proposing solutions. Use interleaved thinking to work through architectural decisions, complex debugging, and multi-step problems. Your responses should be thorough and well-reasoned."
     },
     "normal": {
       "description": "Normal subagent for routine tasks and quick operations. Use for simple searches, straightforward code changes, file operations, and tasks that don't require deep reasoning.",
       "mode": "subagent",
-      "model": "zai-coding-plan/glm-4.7"
-    },
-    "explore": {
-      "description": "Codebase discovery agent for parallel discovery - analyzes structure, finds patterns, identifies modification targets",
-      "mode": "subagent",
-      "model": "chutes/MiniMaxAI/MiniMax-M2.1-TEE"
-    },
-    "coder": {
-      "description": "Implementation specialist for executing development plans and code modifications. Delegates to @explore for context discovery.",
-      "mode": "subagent",
-      "model": "github-copilot/gpt-5.2"
-    },
-    "repositoryAnalyst": {
-      "description": "Deep codebase analyst with ultrathink - comprehensive analysis, architectural reviews, long-form reasoning",
-      "mode": "subagent",
-      "model": "github-copilot/gpt-5.2"
-    },
-    "reviewer": {
-      "description": "Comprehensive code reviewer - detailed reviews with thorough analysis and enhanced assessment",
-      "mode": "subagent",
-      "model": "github-copilot/gpt-5.2"
-    },
-    "summarizer": {
-      "description": "Session summarizer - condenses subagent sessions for main agent orchestration",
-      "mode": "subagent",
-      "model": "chutes/MiniMaxAI/MiniMax-M2.1-TEE"
-    },
-    "PromptEnhancer": {
-      "description": "Expert metaprompter - enhances prompts with context, clarity, and detail for high-quality subagent tasks",
-      "mode": "subagent",
-      "model": "chutes/MiniMaxAI/MiniMax-M2.1-TEE"
-    },
-    "quickReviewer": {
-      "description": "Rapid first-pass reviewer - fast assessments for initial validation and quick feedback",
-      "mode": "subagent",
-      "model": "chutes/MiniMaxAI/MiniMax-M2.1-TEE"
+      "model": "zai/glm-4.7-fast",
+      "systemPrompt": "You are a quick and efficient coding assistant. Respond directly and efficiently without overthinking simple tasks. Focus on getting things done quickly while maintaining accuracy. For routine operations like file searches, simple code changes, and straightforward questions, provide concise answers and take immediate action."
     }
   },
   "default_agent": "general",
